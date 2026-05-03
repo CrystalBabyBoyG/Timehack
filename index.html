@@ -33,7 +33,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 2rem 1.5rem;
+            padding: 0.8rem 1.5rem;
             overflow-x: hidden;
         }
         body::before {
@@ -69,7 +69,7 @@
             letter-spacing: 0.35em;
             color: var(--accent);
             text-shadow: var(--glow);
-            margin-bottom: 0.2em;
+            margin-bottom: 0.1em;
             text-align: center;
         }
         .tagline {
@@ -77,7 +77,7 @@
             letter-spacing: 0.3em;
             color: var(--text-dim);
             text-transform: uppercase;
-            margin-bottom: 2rem;
+            margin-bottom: 0.8rem;
         }
 
         /* ── Card ── */
@@ -87,7 +87,7 @@
             -webkit-backdrop-filter: blur(18px) brightness(1.08);
             border: 1px solid rgba(255, 255, 255, 0.13);
             border-radius: 20px;
-            padding: 2rem 1.8rem;
+            padding: 1.1rem 1.5rem;
             width: 100%;
             box-shadow: 0 0 50px rgba(255,255,255,0.04), 0 20px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 0 30px rgba(255,255,255,0.02);
         }
@@ -153,7 +153,7 @@
             letter-spacing: 0.3em;
             color: var(--text-dim);
             text-transform: uppercase;
-            margin-bottom: 1.2rem;
+            margin-bottom: 0.5rem;
             display: flex;
             align-items: center;
             gap: 0.7rem;
@@ -164,7 +164,7 @@
         .interval-setter {
             display: flex;
             gap: 0.8rem;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
             align-items: flex-start;
             justify-content: center;
         }
@@ -175,10 +175,10 @@
             background: var(--surface2);
             border: 1px solid rgba(255,255,255,0.18);
             color: var(--text-dim);
-            width: 4.5rem;
-            height: 1.8rem;
+            width: 4rem;
+            height: 1.5rem;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             transition: all 0.15s;
             user-select: none;
         }
@@ -193,10 +193,10 @@
             border-bottom: none;
             color: var(--accent);
             font-family: 'Share Tech Mono', monospace;
-            font-size: 2.2rem;
-            width: 4.5rem;
+            font-size: 1.8rem;
+            width: 4rem;
             text-align: center;
-            padding: 0.4rem 0;
+            padding: 0.2rem 0;
             outline: none;
             -moz-appearance: textfield;
             appearance: textfield;
@@ -205,13 +205,13 @@
         .time-input::-webkit-outer-spin-button, .time-input::-webkit-inner-spin-button { -webkit-appearance: none; }
         .time-input:focus { box-shadow: inset 0 0 15px rgba(255,255,255,0.1); }
         .time-input:disabled { color: var(--text-dim); opacity: 0.5; }
-        .colon { font-family: 'Share Tech Mono', monospace; font-size: 2rem; color: var(--text-dim); padding-top: 1.8rem; line-height: 1; }
+        .colon { font-family: 'Share Tech Mono', monospace; font-size: 1.6rem; color: var(--text-dim); padding-top: 1.4rem; line-height: 1; }
 
         /* ── Preset buttons ── */
         .preset-row {
             display: flex;
             gap: 0.45rem;
-            margin-bottom: 1.8rem;
+            margin-bottom: 0.7rem;
             justify-content: center;
             flex-wrap: wrap;
         }
@@ -233,12 +233,12 @@
         /* ── Countdown ── */
         .countdown-section {
             text-align: center;
-            padding: 1.2rem 0 0.8rem;
+            padding: 0.5rem 0 0.3rem;
             border-top: 1px solid rgba(255,255,255,0.05);
         }
         .countdown {
             font-family: 'Share Tech Mono', monospace;
-            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-size: clamp(2rem, 6vw, 3.5rem);
             color: var(--accent);
             text-shadow: var(--glow);
             letter-spacing: 0.05em;
@@ -247,7 +247,7 @@
         .countdown.alerting { color: var(--danger); text-shadow: var(--glow-red); animation: flashText 0.8s ease; }
         @keyframes flashText { 0%,100%{opacity:1} 40%{opacity:0.1} }
         .status-row {
-            margin-top: 0.8rem;
+            margin-top: 0.3rem;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -264,14 +264,14 @@
         @keyframes dotPulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
         /* ── Progress bar ── */
-        .progress-wrap { height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; margin: 1rem 0 1.5rem; overflow: hidden; }
+        .progress-wrap { height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; margin: 0.5rem 0 0.8rem; overflow: hidden; }
         .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 2px; width: 0%; transition: width 0.95s linear; box-shadow: 0 0 8px rgba(255,255,255,0.5); }
 
         /* ── Buttons ── */
-        .controls { display: flex; gap: 0.8rem; margin-bottom: 1.5rem; }
+        .controls { display: flex; gap: 0.8rem; margin-bottom: 0.7rem; }
         .btn {
             flex: 1;
-            padding: 0.9rem 0.5rem;
+            padding: 0.65rem 0.5rem;
             border: none;
             border-radius: 12px;
             font-family: 'Rajdhani', sans-serif;
@@ -298,9 +298,9 @@
         .btn-neutral:hover:not(:disabled) { background: rgba(240,240,240,0.1); color: var(--text); }
 
         /* ── Stats ── */
-        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1.2rem; }
-        .stat { background: var(--surface2); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; padding: 0.9rem; text-align: center; }
-        .stat-value { font-family: 'Share Tech Mono', monospace; font-size: 1.7rem; color: var(--accent2); text-shadow: 0 0 15px rgba(200,200,200,0.4); }
+        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-bottom: 0.6rem; }
+        .stat { background: var(--surface2); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; padding: 0.5rem; text-align: center; }
+        .stat-value { font-family: 'Share Tech Mono', monospace; font-size: 1.3rem; color: var(--accent2); text-shadow: 0 0 15px rgba(200,200,200,0.4); }
         .stat-label { font-size: 0.65rem; letter-spacing: 0.2em; color: var(--text-dim); text-transform: uppercase; margin-top: 0.2rem; }
 
         /* ── Keyboard hints ── */
@@ -314,8 +314,8 @@
         @keyframes overlayFlash { 0%{opacity:0} 15%{opacity:1} 100%{opacity:0} }
 
         /* ── Sound selector ── */
-        .sound-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; margin-bottom: 1rem; }
-        .sound-card { background: var(--surface2); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 0.7rem 0.3rem; text-align: center; cursor: pointer; transition: all 0.18s; display: flex; flex-direction: column; align-items: center; gap: 0.35rem; }
+        .sound-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.4rem; margin-bottom: 0.5rem; }
+        .sound-card { background: var(--surface2); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 0.45rem 0.3rem; text-align: center; cursor: pointer; transition: all 0.18s; display: flex; flex-direction: column; align-items: center; gap: 0.35rem; }
         .sound-card:hover { border-color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.05); }
         .sound-card.selected { border-color: var(--accent); background: rgba(255,255,255,0.09); box-shadow: 0 0 12px rgba(255,255,255,0.18); }
         .sound-icon { font-size: 1.3rem; line-height: 1; }
@@ -325,7 +325,7 @@
         .preview-btn:hover, .preview-btn.playing { background: rgba(255,255,255,0.12); border-color: var(--accent); color: var(--accent); }
 
         /* ── Volume ── */
-        .volume-row { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.2rem; padding: 0 0.2rem; }
+        .volume-row { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.6rem; padding: 0 0.2rem; }
         .volume-icon { font-size: 0.85rem; flex-shrink: 0; color: var(--text-dim); width: 1.1rem; text-align: center; }
         .volume-slider { flex: 1; -webkit-appearance: none; appearance: none; height: 3px; background: rgba(255,255,255,0.15); border-radius: 2px; outline: none; cursor: pointer; }
         .volume-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px; border-radius: 50%; background: var(--accent); cursor: pointer; box-shadow: 0 0 6px rgba(255,255,255,0.6); }
@@ -333,7 +333,7 @@
         .volume-label { font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; color: var(--text-dim); width: 2.2rem; text-align: right; flex-shrink: 0; }
 
         /* ── Upload zone ── */
-        .upload-zone { border: 1px dashed rgba(255,255,255,0.28); border-radius: 10px; padding: 0.8rem 1rem; margin-bottom: 1.5rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 0.8rem; }
+        .upload-zone { border: 1px dashed rgba(255,255,255,0.28); border-radius: 10px; padding: 0.5rem 0.8rem; margin-bottom: 0.7rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 0.8rem; }
         .upload-zone:hover { border-color: rgba(255,255,255,0.55); background: rgba(255,255,255,0.04); }
         .upload-zone.dragover { border-color: var(--accent); background: rgba(255,255,255,0.08); }
         .upload-zone.loaded { border-style: solid; border-color: var(--accent); background: rgba(255,255,255,0.06); }
@@ -498,13 +498,13 @@
         .clock-dot { opacity: 0.35; }
 
         /* ── Sequence ── */
-        .seq-add-row { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.8rem; justify-content: center; }
+        .seq-add-row { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.4rem; justify-content: center; }
         .seq-reps-group { display: flex; align-items: center; gap: 0.5rem; }
         .seq-x-symbol { font-family: 'Share Tech Mono', monospace; font-size: 1.4rem; color: var(--text-dim); line-height: 1; }
         .seq-reps-input { width: 3.5rem !important; font-size: 1.6rem !important; }
         .reps-suffix { font-size: 0.65rem; letter-spacing: 0.2em; color: var(--text-dim); text-transform: uppercase; }
         .seq-add-btn { padding: 0.6rem 1.2rem !important; flex: none !important; font-size: 0.88rem !important; }
-        .seq-list { background: var(--surface2); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 0.5rem; margin-bottom: 1rem; max-height: 150px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.2) transparent; }
+        .seq-list { background: var(--surface2); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 0.4rem; margin-bottom: 0.5rem; max-height: 100px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.2) transparent; }
         .seq-list::-webkit-scrollbar { width: 3px; }
         .seq-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
         .seq-empty { text-align: center; padding: 0.7rem; font-size: 0.68rem; color: var(--text-dim); letter-spacing: 0.08em; }
@@ -519,7 +519,7 @@
         .seq-item-del:disabled { opacity: 0.2; cursor: not-allowed; }
         .seq-total { text-align: right; font-size: 0.65rem; color: var(--text-dim); padding: 0.3rem 0.4rem 0; letter-spacing: 0.1em; font-family: 'Share Tech Mono', monospace; border-top: 1px solid rgba(255,255,255,0.07); margin-top: 0.2rem; }
         .seq-status { text-align: center; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--accent2); letter-spacing: 0.15em; padding: 0.3rem 0; text-shadow: 0 0 10px rgba(200,200,200,0.35); }
-        .seq-loop-btn { width: 100%; padding: 0.55rem; border: 1px solid rgba(240,240,240,0.2); border-radius: 10px; background: rgba(240,240,240,0.04); color: var(--text-dim); font-family: 'Rajdhani', sans-serif; font-size: 0.88rem; font-weight: 700; letter-spacing: 0.22em; cursor: pointer; text-transform: uppercase; margin-bottom: 1rem; transition: all 0.2s; }
+        .seq-loop-btn { width: 100%; padding: 0.4rem; border: 1px solid rgba(240,240,240,0.2); border-radius: 10px; background: rgba(240,240,240,0.04); color: var(--text-dim); font-family: 'Rajdhani', sans-serif; font-size: 0.88rem; font-weight: 700; letter-spacing: 0.22em; cursor: pointer; text-transform: uppercase; margin-bottom: 0.5rem; transition: all 0.2s; }
         .seq-loop-btn:hover:not(:disabled) { border-color: rgba(255,255,255,0.4); color: var(--text); background: rgba(255,255,255,0.05); }
         .seq-loop-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(255,255,255,0.1); box-shadow: 0 0 14px rgba(255,255,255,0.15); }
         .seq-loop-btn:disabled { opacity: 0.2; cursor: not-allowed; }
