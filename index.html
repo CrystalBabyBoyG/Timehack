@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TIME HACK — Interval Alert System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #080808;
+            --surface: rgba(0, 0, 0, 0.72);
+            --surface2: rgba(0, 0, 0, 0.82);
+            --accent: #ffffff;
+            --accent2: #cccccc;
+            --danger: #ff4444;
+            --success: #ffffff;
+            --text: #f0f0f0;
+            --text-dim: #888888;
+            --glow: 0 0 28px rgba(255, 255, 255, 0.35);
+            --glow-red: 0 0 25px rgba(255, 68, 68, 0.5);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #080808;
+            background-image: url('bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text);
+            font-family: 'Rajdhani', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1.5rem;
+            overflow-x: hidden;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.50);
+            pointer-events: none;
+            z-index: 0;
+        }
+        body::after {
+            display: none;
+        }
+
+        /* ── Layout ── */
+        .page-layout {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 2.5rem;
+            width: 100%;
+            max-width: 1500px;
+            align-items: center;
+        }
+        .grid-center { display: flex; flex-direction: column; align-items: center; }
+        .grid-right { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
+
+        /* ── Header ── */
+        .logo {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            letter-spacing: 0.35em;
+            color: var(--accent);
+            text-shadow: var(--glow);
+            margin-bottom: 0.2em;
+            text-align: center;
+        }
+        .tagline {
+            font-size: 0.78rem;
+            letter-spacing: 0.3em;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+        }
+
+        /* ── Card ── */
+        .card {
+            background: var(--surface);
+            backdrop-filter: blur(18px) brightness(1.08);
+            -webkit-backdrop-filter: blur(18px) brightness(1.08);
+            border: 1px solid rgba(255, 255, 255, 0.13);
+            border-radius: 20px;
+            padding: 2rem 1.8rem;
+            width: 100%;
+            box-shadow: 0 0 50px rgba(255,255,255,0.04), 0 20px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 0 30px rgba(255,255,255,0.02);
+        }
+
+        /* ── Sidebar nav ── */
+        .grid-left {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+        .sidebar {
+            background: var(--surface);
+            backdrop-filter: blur(18px) brightness(1.08);
+            -webkit-backdrop-filter: blur(18px) brightness(1.08);
+            border: 1px solid rgba(255, 255, 255, 0.13);
+            border-radius: 16px;
+            padding: 0.8rem 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            box-shadow: 0 0 50px rgba(255,255,255,0.04), 0 20px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06);
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 1rem 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            position: relative;
+            min-width: 78px;
+            user-select: none;
+        }
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.25);
+            box-shadow: inset 3px 0 0 var(--accent), 0 0 14px rgba(255, 255, 255, 0.08);
+        }
+        .nav-icon { font-size: 1.5rem; line-height: 1; }
+        .nav-label {
+            font-size: 0.6rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-dim);
+            font-family: 'Rajdhani', sans-serif;
+        }
+        .nav-item.active .nav-label {
+            color: var(--accent);
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+        }
+
+        /* ── Section label ── */
+        .section-label {
+            font-size: 0.7rem;
+            letter-spacing: 0.3em;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+        }
+        .section-label::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.12); }
+
+        /* ── Interval setter ── */
+        .interval-setter {
+            display: flex;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+            align-items: flex-start;
+            justify-content: center;
+        }
+        .time-unit { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+        .time-unit label { font-size: 0.65rem; letter-spacing: 0.2em; color: var(--text-dim); text-transform: uppercase; }
+        .time-input-wrap { display: flex; flex-direction: column; align-items: center; }
+        .spin-btn {
+            background: var(--surface2);
+            border: 1px solid rgba(255,255,255,0.18);
+            color: var(--text-dim);
+            width: 4.5rem;
+            height: 1.8rem;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.15s;
+            user-select: none;
+        }
+        .spin-btn:hover { color: var(--accent); background: rgba(255,255,255,0.06); }
+        .spin-btn.up { border-radius: 6px 6px 0 0; border-bottom: none; }
+        .spin-btn.down { border-radius: 0 0 6px 6px; border-top: none; }
+        .spin-btn:disabled { opacity: 0.2; cursor: not-allowed; }
+        .time-input {
+            background: var(--surface2);
+            border: 1px solid rgba(255,255,255,0.22);
+            border-top: none;
+            border-bottom: none;
+            color: var(--accent);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 2.2rem;
+            width: 4.5rem;
+            text-align: center;
+            padding: 0.4rem 0;
+            outline: none;
+            -moz-appearance: textfield;
+            appearance: textfield;
+            transition: box-shadow 0.2s;
+        }
+        .time-input::-webkit-outer-spin-button, .time-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+        .time-input:focus { box-shadow: inset 0 0 15px rgba(255,255,255,0.1); }
+        .time-input:disabled { color: var(--text-dim); opacity: 0.5; }
+        .colon { font-family: 'Share Tech Mono', monospace; font-size: 2rem; color: var(--text-dim); padding-top: 1.8rem; line-height: 1; }
+
+        /* ── Preset buttons ── */
+        .preset-row {
+            display: flex;
+            gap: 0.45rem;
+            margin-bottom: 1.8rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .preset-btn {
+            background: var(--surface2);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 7px;
+            color: var(--text-dim);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.72rem;
+            padding: 0.35rem 0.75rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            letter-spacing: 0.05em;
+        }
+        .preset-btn:hover:not(:disabled) { border-color: rgba(255,255,255,0.5); color: var(--accent); background: rgba(255,255,255,0.07); }
+        .preset-btn:disabled { opacity: 0.2; cursor: not-allowed; }
+
+        /* ── Countdown ── */
+        .countdown-section {
+            text-align: center;
+            padding: 1.2rem 0 0.8rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .countdown {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            color: var(--accent);
+            text-shadow: var(--glow);
+            letter-spacing: 0.05em;
+            line-height: 1;
+        }
+        .countdown.alerting { color: var(--danger); text-shadow: var(--glow-red); animation: flashText 0.8s ease; }
+        @keyframes flashText { 0%,100%{opacity:1} 40%{opacity:0.1} }
+        .status-row {
+            margin-top: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            font-size: 0.75rem;
+            letter-spacing: 0.25em;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-dim); transition: background 0.3s, box-shadow 0.3s; flex-shrink: 0; }
+        .status-dot.running { background: var(--success); box-shadow: 0 0 10px rgba(255,255,255,0.8); animation: dotPulse 1.5s infinite; }
+        .status-dot.paused { background: #ffaa00; box-shadow: 0 0 10px rgba(255,170,0,0.7); }
+        .status-dot.alarm-on { background: var(--accent); box-shadow: 0 0 10px rgba(255,255,255,0.7); animation: dotPulse 2s infinite; }
+        @keyframes dotPulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+        /* ── Progress bar ── */
+        .progress-wrap { height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; margin: 1rem 0 1.5rem; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 2px; width: 0%; transition: width 0.95s linear; box-shadow: 0 0 8px rgba(255,255,255,0.5); }
+
+        /* ── Buttons ── */
+        .controls { display: flex; gap: 0.8rem; margin-bottom: 1.5rem; }
+        .btn {
+            flex: 1;
+            padding: 0.9rem 0.5rem;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(255,255,255,0.06), transparent); pointer-events: none; }
+        .btn-start { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.5); color: var(--accent); }
+        .btn-start:hover:not(:disabled) { background: rgba(255,255,255,0.15); box-shadow: var(--glow); }
+        .btn-start.paused { background: rgba(255,170,0,0.08); border-color: rgba(255,170,0,0.5); color: #ffaa00; }
+        .btn-start.paused:hover:not(:disabled) { background: rgba(255,170,0,0.15); box-shadow: 0 0 20px rgba(255,170,0,0.35); }
+        .btn-start:active:not(:disabled) { transform: scale(0.98); }
+        .btn-stop { background: rgba(255,23,68,0.08); border: 1px solid rgba(255,23,68,0.5); color: var(--danger); }
+        .btn-stop:hover:not(:disabled) { background: rgba(255,23,68,0.15); box-shadow: var(--glow-red); }
+        .btn-stop:active:not(:disabled) { transform: scale(0.98); }
+        .btn:disabled { opacity: 0.25; cursor: not-allowed; }
+        .btn-neutral { background: rgba(240,240,240,0.06); border: 1px solid rgba(240,240,240,0.2); color: var(--text-dim); }
+        .btn-neutral:hover:not(:disabled) { background: rgba(240,240,240,0.1); color: var(--text); }
+
+        /* ── Stats ── */
+        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1.2rem; }
+        .stat { background: var(--surface2); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; padding: 0.9rem; text-align: center; }
+        .stat-value { font-family: 'Share Tech Mono', monospace; font-size: 1.7rem; color: var(--accent2); text-shadow: 0 0 15px rgba(200,200,200,0.4); }
+        .stat-label { font-size: 0.65rem; letter-spacing: 0.2em; color: var(--text-dim); text-transform: uppercase; margin-top: 0.2rem; }
+
+        /* ── Keyboard hints ── */
+        .kb-hints { display: flex; gap: 1.2rem; justify-content: center; flex-wrap: wrap; }
+        .kb-hint { font-size: 0.62rem; color: rgba(136,136,136,0.6); letter-spacing: 0.08em; display: flex; align-items: center; gap: 0.35rem; }
+        .kb-key { display: inline-block; background: var(--surface2); border: 1px solid rgba(255,255,255,0.08); border-radius: 3px; padding: 0.08rem 0.4rem; font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; color: rgba(136,136,136,0.8); }
+
+        /* ── Alert overlay ── */
+        .alert-overlay { position: fixed; inset: 0; pointer-events: none; opacity: 0; z-index: 10; border: 3px solid var(--danger); box-shadow: inset 0 0 80px rgba(255,23,68,0.15); }
+        .alert-overlay.show { animation: overlayFlash 1s ease forwards; }
+        @keyframes overlayFlash { 0%{opacity:0} 15%{opacity:1} 100%{opacity:0} }
+
+        /* ── Sound selector ── */
+        .sound-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; margin-bottom: 1rem; }
+        .sound-card { background: var(--surface2); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 0.7rem 0.3rem; text-align: center; cursor: pointer; transition: all 0.18s; display: flex; flex-direction: column; align-items: center; gap: 0.35rem; }
+        .sound-card:hover { border-color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.05); }
+        .sound-card.selected { border-color: var(--accent); background: rgba(255,255,255,0.09); box-shadow: 0 0 12px rgba(255,255,255,0.18); }
+        .sound-icon { font-size: 1.3rem; line-height: 1; }
+        .sound-name { font-size: 0.6rem; letter-spacing: 0.1em; color: var(--text-dim); text-transform: uppercase; font-weight: 600; }
+        .sound-card.selected .sound-name { color: var(--accent); }
+        .preview-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; color: var(--text-dim); font-size: 0.55rem; padding: 0.2rem 0.35rem; cursor: pointer; letter-spacing: 0.05em; transition: all 0.15s; font-family: 'Rajdhani', sans-serif; }
+        .preview-btn:hover, .preview-btn.playing { background: rgba(255,255,255,0.12); border-color: var(--accent); color: var(--accent); }
+
+        /* ── Volume ── */
+        .volume-row { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.2rem; padding: 0 0.2rem; }
+        .volume-icon { font-size: 0.85rem; flex-shrink: 0; color: var(--text-dim); width: 1.1rem; text-align: center; }
+        .volume-slider { flex: 1; -webkit-appearance: none; appearance: none; height: 3px; background: rgba(255,255,255,0.15); border-radius: 2px; outline: none; cursor: pointer; }
+        .volume-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px; border-radius: 50%; background: var(--accent); cursor: pointer; box-shadow: 0 0 6px rgba(255,255,255,0.6); }
+        .volume-slider::-moz-range-thumb { width: 13px; height: 13px; border-radius: 50%; background: var(--accent); cursor: pointer; border: none; box-shadow: 0 0 6px rgba(255,255,255,0.6); }
+        .volume-label { font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; color: var(--text-dim); width: 2.2rem; text-align: right; flex-shrink: 0; }
+
+        /* ── Upload zone ── */
+        .upload-zone { border: 1px dashed rgba(255,255,255,0.28); border-radius: 10px; padding: 0.8rem 1rem; margin-bottom: 1.5rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 0.8rem; }
+        .upload-zone:hover { border-color: rgba(255,255,255,0.55); background: rgba(255,255,255,0.04); }
+        .upload-zone.dragover { border-color: var(--accent); background: rgba(255,255,255,0.08); }
+        .upload-zone.loaded { border-style: solid; border-color: var(--accent); background: rgba(255,255,255,0.06); }
+        .upload-zone.selected-sound { box-shadow: 0 0 12px rgba(255,255,255,0.18); }
+        .upload-icon { font-size: 1.4rem; flex-shrink: 0; }
+        .upload-info { flex: 1; min-width: 0; }
+        .upload-title { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-dim); }
+        .upload-zone.loaded .upload-title { color: var(--accent); }
+        .upload-filename { font-size: 0.7rem; color: var(--text-dim); margin-top: 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .upload-hint { font-size: 0.65rem; color: rgba(136,136,136,0.7); margin-top: 0.15rem; }
+        .upload-preview-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: var(--text-dim); font-size: 0.7rem; padding: 0.3rem 0.6rem; cursor: pointer; letter-spacing: 0.05em; transition: all 0.15s; font-family: 'Rajdhani', sans-serif; flex-shrink: 0; }
+        .upload-preview-btn:hover { background: rgba(255,255,255,0.12); border-color: var(--accent); color: var(--accent); }
+        .sound-notice { display: none; background: rgba(255,152,0,0.1); border: 1px solid rgba(255,152,0,0.3); border-radius: 8px; padding: 0.6rem 1rem; font-size: 0.8rem; color: #ff9800; margin-bottom: 1rem; text-align: center; }
+
+        /* ── Alarm panel ── */
+        .alarm-setter { display: flex; gap: 0.8rem; margin-bottom: 1.5rem; align-items: flex-start; justify-content: center; }
+        .alarm-display {
+            text-align: center;
+            padding: 1.2rem 0 0.8rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 1rem;
+        }
+        .alarm-big {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            color: var(--accent);
+            text-shadow: var(--glow);
+            letter-spacing: 0.05em;
+            line-height: 1;
+        }
+        .alarm-big.firing { animation: alarmFlash 0.5s ease infinite; color: var(--danger); text-shadow: var(--glow-red); }
+        @keyframes alarmFlash { 0%,100%{opacity:1} 50%{opacity:0.2} }
+        .alarm-countdown-text { font-family: 'Share Tech Mono', monospace; font-size: 0.9rem; color: var(--text-dim); letter-spacing: 0.12em; margin-top: 0.5rem; }
+        .alarm-controls { display: flex; gap: 0.8rem; margin-top: 1.2rem; margin-bottom: 1.5rem; }
+
+        /* ── Floating alarm notification ── */
+        .alarm-notif {
+            position: fixed;
+            top: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(5, 5, 5, 0.92);
+            border: 1px solid rgba(255,23,68,0.6);
+            backdrop-filter: blur(16px);
+            border-radius: 14px;
+            padding: 0.9rem 1.5rem;
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            z-index: 50;
+            animation: slideDown 0.3s ease;
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--danger);
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
+            box-shadow: 0 4px 30px rgba(255,23,68,0.25), var(--glow-red);
+            white-space: nowrap;
+        }
+        .alarm-notif.visible { display: flex; }
+        @keyframes slideDown { from{opacity:0;transform:translateX(-50%) translateY(-1rem)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+        .alarm-notif-label { text-shadow: var(--glow-red); }
+        .alarm-notif-time { color: #fff; font-size: 1.1rem; }
+        .alarm-notif-btn {
+            background: rgba(255,23,68,0.12);
+            border: 1px solid rgba(255,23,68,0.4);
+            border-radius: 7px;
+            color: var(--danger);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            padding: 0.35rem 0.9rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.15s;
+        }
+        .alarm-notif-btn:hover { background: rgba(255,23,68,0.22); }
+        .alarm-notif-btn.snooze { border-color: rgba(255,170,0,0.5); color: #ffaa00; background: rgba(255,170,0,0.08); }
+        .alarm-notif-btn.snooze:hover { background: rgba(255,170,0,0.15); }
+
+        /* ── Stopwatch panel ── */
+        .sw-display {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: clamp(2.8rem, 9vw, 4.5rem);
+            color: var(--accent);
+            text-shadow: var(--glow);
+            letter-spacing: 0.04em;
+            text-align: center;
+            line-height: 1;
+            padding: 1.2rem 0 0.8rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 0.8rem;
+        }
+        .sw-cs { font-size: 0.52em; color: var(--accent2); opacity: 0.85; }
+        .sw-lap-btn {
+            width: 100%;
+            padding: 0.65rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.04);
+            color: var(--text-dim);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            transition: all 0.2s;
+        }
+        .sw-lap-btn:hover:not(:disabled) { border-color: rgba(255,255,255,0.45); color: var(--accent); background: rgba(255,255,255,0.08); }
+        .sw-lap-btn:disabled { opacity: 0.2; cursor: not-allowed; }
+        .sw-laps {
+            max-height: 210px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.2) transparent;
+        }
+        .sw-laps::-webkit-scrollbar { width: 3px; }
+        .sw-laps::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+        .sw-lap-header {
+            display: grid;
+            grid-template-columns: 2.2rem 1fr 1fr;
+            gap: 0.5rem;
+            padding: 0 0.4rem 0.5rem;
+            font-size: 0.6rem;
+            letter-spacing: 0.2em;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 0.2rem;
+        }
+        .sw-lap-row {
+            display: grid;
+            grid-template-columns: 2.2rem 1fr 1fr;
+            gap: 0.5rem;
+            align-items: center;
+            padding: 0.45rem 0.4rem;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.82rem;
+            transition: background 0.15s;
+        }
+        .sw-lap-row:last-child { border-bottom: none; }
+        .sw-lap-row:hover { background: rgba(255,255,255,0.03); }
+        .sw-lap-num { color: var(--text-dim); font-size: 0.7rem; }
+        .sw-lap-split { color: var(--text); }
+        .sw-lap-total { color: var(--text-dim); font-size: 0.75rem; }
+        .sw-lap-row.best .sw-lap-split { color: var(--accent); text-shadow: 0 0 8px rgba(255,255,255,0.4); }
+        .sw-lap-row.worst .sw-lap-split { color: var(--danger); }
+        .sw-empty { text-align: center; padding: 1.5rem 0; font-size: 0.75rem; letter-spacing: 0.2em; color: var(--text-dim); text-transform: uppercase; }
+
+        /* ── Clock ── */
+        #analogClock { width: min(100%, 420px); aspect-ratio: 1/1; border-radius: 18%; display: block; filter: drop-shadow(0 0 20px rgba(255,255,255,0.12)); }
+        .clock-digital { text-align: center; }
+        .clock-digital-time { font-family: 'Share Tech Mono', monospace; font-size: clamp(1.8rem,4vw,2.6rem); color: var(--accent); text-shadow: var(--glow); letter-spacing: 0.08em; }
+        .clock-digital-date { font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--text-dim); letter-spacing: 0.2em; margin-top: 0.4rem; }
+        .clock-year { font-family: 'Share Tech Mono', monospace; font-size: clamp(1.2rem,3vw,1.7rem); color: var(--accent); text-shadow: var(--glow); letter-spacing: 0.2em; text-align: center; margin-top: 0.4rem; }
+        .clock-date-dow { display: flex; align-items: center; justify-content: center; gap: 0.6rem; margin-top: 0.25rem; font-family: 'Share Tech Mono', monospace; font-size: clamp(0.8rem,2vw,1rem); color: var(--text-dim); letter-spacing: 0.18em; }
+        .clock-dow { color: rgba(255,255,255,0.6); }
+        .clock-dot { opacity: 0.35; }
+
+        /* ── Sequence ── */
+        .seq-add-row { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.8rem; justify-content: center; }
+        .seq-reps-group { display: flex; align-items: center; gap: 0.5rem; }
+        .seq-x-symbol { font-family: 'Share Tech Mono', monospace; font-size: 1.4rem; color: var(--text-dim); line-height: 1; }
+        .seq-reps-input { width: 3.5rem !important; font-size: 1.6rem !important; }
+        .reps-suffix { font-size: 0.65rem; letter-spacing: 0.2em; color: var(--text-dim); text-transform: uppercase; }
+        .seq-add-btn { padding: 0.6rem 1.2rem !important; flex: none !important; font-size: 0.88rem !important; }
+        .seq-list { background: var(--surface2); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 0.5rem; margin-bottom: 1rem; max-height: 150px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.2) transparent; }
+        .seq-list::-webkit-scrollbar { width: 3px; }
+        .seq-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+        .seq-empty { text-align: center; padding: 0.7rem; font-size: 0.68rem; color: var(--text-dim); letter-spacing: 0.08em; }
+        .seq-item { display: flex; align-items: center; padding: 0.38rem 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.07); gap: 0.6rem; }
+        .seq-item:last-of-type { border-bottom: none; }
+        .seq-item-num { width: 1.1rem; font-size: 0.7rem; color: var(--text-dim); font-family: 'Share Tech Mono', monospace; flex-shrink: 0; }
+        .seq-item-active .seq-item-num { color: var(--accent); text-shadow: 0 0 8px rgba(255,255,255,0.5); }
+        .seq-item-info { flex: 1; font-family: 'Share Tech Mono', monospace; font-size: 0.82rem; color: var(--text); }
+        .seq-item-active .seq-item-info { color: var(--accent); }
+        .seq-item-del { background: none; border: 1px solid rgba(255,23,68,0.2); border-radius: 4px; color: rgba(255,23,68,0.45); width: 1.5rem; height: 1.5rem; cursor: pointer; font-size: 0.85rem; transition: all 0.15s; display: flex; align-items: center; justify-content: center; flex-shrink: 0; line-height: 1; }
+        .seq-item-del:hover:not(:disabled) { border-color: var(--danger); color: var(--danger); background: rgba(255,23,68,0.08); }
+        .seq-item-del:disabled { opacity: 0.2; cursor: not-allowed; }
+        .seq-total { text-align: right; font-size: 0.65rem; color: var(--text-dim); padding: 0.3rem 0.4rem 0; letter-spacing: 0.1em; font-family: 'Share Tech Mono', monospace; border-top: 1px solid rgba(255,255,255,0.07); margin-top: 0.2rem; }
+        .seq-status { text-align: center; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--accent2); letter-spacing: 0.15em; padding: 0.3rem 0; text-shadow: 0 0 10px rgba(200,200,200,0.35); }
+        .seq-loop-btn { width: 100%; padding: 0.55rem; border: 1px solid rgba(240,240,240,0.2); border-radius: 10px; background: rgba(240,240,240,0.04); color: var(--text-dim); font-family: 'Rajdhani', sans-serif; font-size: 0.88rem; font-weight: 700; letter-spacing: 0.22em; cursor: pointer; text-transform: uppercase; margin-bottom: 1rem; transition: all 0.2s; }
+        .seq-loop-btn:hover:not(:disabled) { border-color: rgba(255,255,255,0.4); color: var(--text); background: rgba(255,255,255,0.05); }
+        .seq-loop-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(255,255,255,0.1); box-shadow: 0 0 14px rgba(255,255,255,0.15); }
+        .seq-loop-btn:disabled { opacity: 0.2; cursor: not-allowed; }
+
+        .footer { margin-top: 1.5rem; font-size: 0.7rem; letter-spacing: 0.15em; color: rgba(136,136,136,0.5); text-transform: uppercase; }
+
+        /* ── Responsive ── */
+        @media (max-width: 960px) {
+            .page-layout { grid-template-columns: 1fr; }
+            .grid-left { justify-content: center; }
+            .sidebar { flex-direction: row; padding: 0.4rem; border-radius: 12px; }
+            .nav-item { flex-direction: row; gap: 0.5rem; padding: 0.6rem 1rem; min-width: auto; }
+            .nav-item.active { box-shadow: inset 0 -2px 0 var(--accent), 0 0 12px rgba(255, 255, 255, 0.06); }
+            .nav-icon { font-size: 1.1rem; }
+            .grid-right { order: -1; flex-direction: row; align-items: center; justify-content: center; gap: 2rem; flex-wrap: wrap; }
+            #analogClock { width: min(200px, 45vw); }
+        }
+    </style>
+</head>
+<body>
+    <div class="alert-overlay" id="alertOverlay"></div>
+
+    <!-- Floating alarm notification -->
+    <div class="alarm-notif" id="alarmNotif">
+        <span class="alarm-notif-label">⏰ ALARM</span>
+        <span class="alarm-notif-time" id="alarmNotifTime">00:00</span>
+        <button class="alarm-notif-btn snooze" onclick="snoozeAlarm()">Snooze 5m</button>
+        <button class="alarm-notif-btn" onclick="dismissAlarm()">Dismiss</button>
+    </div>
+
+    <div class="page-layout">
+        <div class="grid-left">
+            <nav class="sidebar">
+                <div class="nav-item active" id="nav-timer" onclick="switchTab('timer')">
+                    <span class="nav-icon">⏱</span>
+                    <span class="nav-label">Timer</span>
+                </div>
+                <div class="nav-item" id="nav-alarm" onclick="switchTab('alarm')">
+                    <span class="nav-icon">⏰</span>
+                    <span class="nav-label">Alarm</span>
+                </div>
+                <div class="nav-item" id="nav-sw" onclick="switchTab('sw')">
+                    <span class="nav-icon">⏲</span>
+                    <span class="nav-label">Watch</span>
+                </div>
+            </nav>
+        </div>
+
+        <div class="grid-center">
+            <div class="logo">TIME HACK</div>
+            <div class="tagline">Interval Alert System</div>
+
+            <div class="card">
+                <!-- ══ Timer panel ══ -->
+                <div id="panel-timer">
+                    <div class="section-label">Interval</div>
+                    <div class="interval-setter">
+                        <div class="time-unit">
+                            <div class="time-input-wrap">
+                                <button class="spin-btn up" id="hUp" onclick="spin('hours',1)">▲</button>
+                                <input type="number" class="time-input" id="hours" value="0" min="0" max="23" inputmode="numeric">
+                                <button class="spin-btn down" id="hDown" onclick="spin('hours',-1)">▼</button>
+                            </div>
+                            <label>Hours</label>
+                        </div>
+                        <div class="colon">:</div>
+                        <div class="time-unit">
+                            <div class="time-input-wrap">
+                                <button class="spin-btn up" id="mUp" onclick="spin('minutes',1)">▲</button>
+                                <input type="number" class="time-input" id="minutes" value="5" min="0" max="59" inputmode="numeric">
+                                <button class="spin-btn down" id="mDown" onclick="spin('minutes',-1)">▼</button>
+                            </div>
+                            <label>Min</label>
+                        </div>
+                        <div class="colon">:</div>
+                        <div class="time-unit">
+                            <div class="time-input-wrap">
+                                <button class="spin-btn up" id="sUp" onclick="spin('seconds',1)">▲</button>
+                                <input type="number" class="time-input" id="seconds" value="0" min="0" max="59" inputmode="numeric">
+                                <button class="spin-btn down" id="sDown" onclick="spin('seconds',-1)">▼</button>
+                            </div>
+                            <label>Sec</label>
+                        </div>
+                    </div>
+                    <div class="preset-row" id="presetRow">
+                        <button class="preset-btn" onclick="setPreset(0,1,0)">1m</button>
+                        <button class="preset-btn" onclick="setPreset(0,5,0)">5m</button>
+                        <button class="preset-btn" onclick="setPreset(0,10,0)">10m</button>
+                        <button class="preset-btn" onclick="setPreset(0,25,0)">25m</button>
+                        <button class="preset-btn" onclick="setPreset(1,0,0)">1h</button>
+                    </div>
+                    <div class="section-label">Sequence</div>
+                    <div class="seq-add-row">
+                        <div class="seq-reps-group">
+                            <span class="seq-x-symbol">×</span>
+                            <div class="time-input-wrap">
+                                <button class="spin-btn up" id="repsUp" onclick="spinReps(1)">▲</button>
+                                <input type="number" class="time-input seq-reps-input" id="repsInput" value="1" min="1" max="99" inputmode="numeric">
+                                <button class="spin-btn down" id="repsDown" onclick="spinReps(-1)">▼</button>
+                            </div>
+                            <span class="reps-suffix">Reps</span>
+                        </div>
+                        <button class="btn btn-neutral seq-add-btn" id="seqAddBtn" onclick="addSeqStep()">+ Add Step</button>
+                    </div>
+                    <div id="seqList" class="seq-list">
+                        <div class="seq-empty">ステップを追加（空のままで無限ループ）</div>
+                    </div>
+                    <button class="seq-loop-btn" id="seqLoopBtn" onclick="toggleSeqLoop()">↻ Loop Sequence</button>
+                    <div class="section-label">Sound</div>
+                    <div class="sound-grid">
+                        <div class="sound-card selected" id="sound-trader" onclick="selectSound('trader',this)">
+                            <div class="sound-icon">📈</div>
+                            <div class="sound-name">Trader</div>
+                            <button class="preview-btn" id="prev-trader" onclick="previewSound(event,'trader')">▶ Play</button>
+                        </div>
+                        <div class="sound-card" id="sound-gun" onclick="selectSound('gun',this)">
+                            <div class="sound-icon">🔫</div>
+                            <div class="sound-name">Gun</div>
+                            <button class="preview-btn" id="prev-gun" onclick="previewSound(event,'gun')">▶ Play</button>
+                        </div>
+                        <div class="sound-card" id="sound-cyber" onclick="selectSound('cyber',this)">
+                            <div class="sound-icon">🤖</div>
+                            <div class="sound-name">Cyber</div>
+                            <button class="preview-btn" id="prev-cyber" onclick="previewSound(event,'cyber')">▶ Play</button>
+                        </div>
+                        <div class="sound-card" id="sound-sparring" onclick="selectSound('sparring',this)">
+                            <div class="sound-icon">🥊</div>
+                            <div class="sound-name">Sparring</div>
+                            <button class="preview-btn" id="prev-sparring" onclick="previewSound(event,'sparring')">▶ Play</button>
+                        </div>
+                        <div class="sound-card" id="sound-hiphop" onclick="selectSound('hiphop',this)">
+                            <div class="sound-icon">🎤</div>
+                            <div class="sound-name">Hip-hop</div>
+                            <button class="preview-btn" id="prev-hiphop" onclick="previewSound(event,'hiphop')">▶ Play</button>
+                        </div>
+                    </div>
+                    <div class="volume-row">
+                        <span class="volume-icon" id="volIcon">🔊</span>
+                        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="70" oninput="updateVolume(this.value)">
+                        <span class="volume-label" id="volumeLabel">70%</span>
+                    </div>
+                    <input type="file" id="audioUpload" accept="audio/*" style="display:none">
+                    <div class="upload-zone" id="uploadZone">
+                        <div class="upload-icon" id="uploadIcon">📁</div>
+                        <div class="upload-info">
+                            <div class="upload-title" id="uploadTitle">カスタム音声を追加</div>
+                            <div class="upload-filename" id="uploadFilename" style="display:none"></div>
+                            <div class="upload-hint" id="uploadHint">クリックまたはファイルをドロップ（MP3 / WAV / OGG）</div>
+                        </div>
+                        <button class="upload-preview-btn" id="uploadPreviewBtn" style="display:none" onclick="previewCustomSound(event)">▶ Play</button>
+                    </div>
+                    <div class="section-label">Next Alert</div>
+                    <div class="countdown-section">
+                        <div class="countdown" id="countdown">--:--:--</div>
+                        <div class="status-row">
+                            <div class="status-dot" id="statusDot"></div>
+                            <span id="statusText">Standby</span>
+                        </div>
+                        <div class="seq-status" id="seqStatus" style="display:none"></div>
+                    </div>
+                    <div class="progress-wrap">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="sound-notice" id="soundNotice"></div>
+                    <div class="controls">
+                        <button class="btn btn-start" id="startBtn" onclick="handleStartBtn()">▶ Start</button>
+                        <button class="btn btn-stop" id="stopBtn" onclick="stopTimer()" disabled>■ Stop</button>
+                    </div>
+                    <div class="stats">
+                        <div class="stat">
+                            <div class="stat-value" id="alertCount">0</div>
+                            <div class="stat-label">Alerts</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="elapsedTime">00:00</div>
+                            <div class="stat-label">Elapsed</div>
+                        </div>
+                    </div>
+                    <div class="kb-hints">
+                        <div class="kb-hint"><span class="kb-key">Space</span> Start / Pause</div>
+                        <div class="kb-hint"><span class="kb-key">Esc</span> Stop</div>
+                    </div>
+                </div><!-- /panel-timer -->
+
+                <!-- ══ Alarm panel ══ -->
+                <div id="panel-alarm" style="display:none">
+                    <div class="section-label">Alarm Time</div>
+                    <div class="alarm-setter">
+                        <div class="time-unit">
+                            <div class="time-input-wrap">
+                                <button class="spin-btn up" onclick="spinInput('alarmH',1,23)">▲</button>
+                                <input type="number" class="time-input" id="alarmH" value="7" min="0" max="23" inputmode="numeric">
+                                <button class="spin-btn down" onclick="spinInput('alarmH',-1,23)">▼</button>
+                            </div>
+                            <label>Hour</label>
+                        </div>
+                        <div class="colon">:</div>
+                        <div class="time-unit">
+                            <div class="time-input-wrap">
+                                <button class="spin-btn up" onclick="spinInput('alarmM',1,59)">▲</button>
+                                <input type="number" class="time-input" id="alarmM" value="0" min="0" max="59" inputmode="numeric">
+                                <button class="spin-btn down" onclick="spinInput('alarmM',-1,59)">▼</button>
+                            </div>
+                            <label>Min</label>
+                        </div>
+                    </div>
+                    <div class="alarm-controls">
+                        <button class="btn btn-start" id="alarmSetBtn" onclick="setAlarm()">⏰ Set Alarm</button>
+                    </div>
+
+                    <!-- Status (shown when alarm is set) -->
+                    <div id="alarmStatus" style="display:none">
+                        <div class="section-label">Status</div>
+                        <div class="alarm-display">
+                            <div class="alarm-big" id="alarmBigTime">07:00</div>
+                            <div class="alarm-countdown-text" id="alarmCountdownText">--</div>
+                            <div class="status-row" style="margin-top:0.8rem">
+                                <div class="status-dot alarm-on" id="alarmDot"></div>
+                                <span id="alarmStatusTxt">Alarm Set</span>
+                            </div>
+                        </div>
+                        <div class="alarm-controls" id="alarmActionBtns">
+                            <button class="btn btn-neutral" id="alarmSnoozeBtn" style="display:none" onclick="snoozeAlarm()">Snooze 5m</button>
+                            <button class="btn btn-stop" onclick="cancelAlarm()">■ Cancel</button>
+                        </div>
+                    </div>
+                    <div class="kb-hints">
+                        <div class="kb-hint"><span class="kb-key">Esc</span> Cancel alarm</div>
+                    </div>
+                </div><!-- /panel-alarm -->
+
+                <!-- ══ Stopwatch panel ══ -->
+                <div id="panel-sw" style="display:none">
+                    <div class="sw-display">
+                        <span id="swMain">00:00</span><span class="sw-cs" id="swCs">.00</span>
+                    </div>
+                    <div class="status-row" style="margin-bottom:1.2rem">
+                        <div class="status-dot" id="swDot"></div>
+                        <span id="swStatus">Ready</span>
+                    </div>
+                    <div class="controls">
+                        <button class="btn btn-start" id="swStartBtn" onclick="swHandleStart()">▶ Start</button>
+                        <button class="btn btn-stop" id="swResetBtn" onclick="swReset()" disabled>↺ Reset</button>
+                    </div>
+                    <button class="sw-lap-btn" id="swLapBtn" onclick="swLap()" disabled>◉ Lap</button>
+                    <div class="section-label">Laps</div>
+                    <div id="swLapList">
+                        <div class="sw-empty" id="swEmpty">No laps recorded</div>
+                    </div>
+                    <div class="kb-hints" style="margin-top:1rem">
+                        <div class="kb-hint"><span class="kb-key">Space</span> Start / Pause</div>
+                        <div class="kb-hint"><span class="kb-key">L</span> Lap</div>
+                        <div class="kb-hint"><span class="kb-key">Esc</span> Reset</div>
+                    </div>
+                </div><!-- /panel-sw -->
+
+            </div><!-- /card -->
+            <div class="footer">timehack.com</div>
+        </div><!-- /grid-center -->
+
+        <!-- Right: analog clock -->
+        <div class="grid-right">
+            <canvas id="analogClock" width="420" height="420"></canvas>
+            <div class="clock-digital">
+                <div class="clock-digital-time" id="clockTime">--:--:--</div>
+                <div class="clock-year" id="clockYear">----</div>
+                <div class="clock-date-dow">
+                    <span id="clockMonthDay">--/--</span>
+                    <span class="clock-dot">·</span>
+                    <span class="clock-dow" id="clockDOW">---</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ── Shared ───────────────────────────────────────────────────
+        let currentTab = 'timer';
+        let audioCtx = null;
+        let masterGain = null;
+        let selectedSound = 'trader';
+        let customAudioBuffer = null;
+
+        function pad(n) { return String(n).padStart(2, '0'); }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            ['timer','alarm','sw'].forEach(t => {
+                document.getElementById('nav-' + t).classList.toggle('active', t === tab);
+                document.getElementById('panel-' + t).style.display = t === tab ? '' : 'none';
+            });
+        }
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                masterGain = audioCtx.createGain();
+                masterGain.gain.value = parseInt(document.getElementById('volumeSlider').value) / 100;
+                masterGain.connect(audioCtx.destination);
+            }
+        }
+
+        function updateVolume(val) {
+            document.getElementById('volumeLabel').textContent = val + '%';
+            const n = parseInt(val);
+            document.getElementById('volIcon').textContent = n === 0 ? '🔇' : n < 40 ? '🔉' : '🔊';
+            if (masterGain) masterGain.gain.value = n / 100;
+        }
+
+        function flashOverlay() {
+            const o = document.getElementById('alertOverlay');
+            o.classList.remove('show');
+            void o.offsetWidth;
+            o.classList.add('show');
+        }
+
+        // ── Sound definitions ────────────────────────────────────────
+        const sounds = {
+            trader(ctx) {
+                // Bloomberg式: 3連続アセンディングビープ
+                const now = ctx.currentTime;
+                [880,1100,1320].forEach((freq,i) => {
+                    const osc=ctx.createOscillator(), g=ctx.createGain();
+                    osc.connect(g); g.connect(masterGain);
+                    osc.type='square'; osc.frequency.value=freq;
+                    g.gain.setValueAtTime(0,now+i*0.10);
+                    g.gain.linearRampToValueAtTime(0.22,now+i*0.10+0.008);
+                    g.gain.setValueAtTime(0.22,now+i*0.10+0.062);
+                    g.gain.linearRampToValueAtTime(0,now+i*0.10+0.082);
+                    osc.start(now+i*0.10); osc.stop(now+i*0.10+0.09);
+                });
+            },
+            gun(ctx) {
+                // 銃声: ノイズバースト + サブベース
+                const now = ctx.currentTime;
+                const bufSize=Math.floor(ctx.sampleRate*0.35);
+                const buf=ctx.createBuffer(1,bufSize,ctx.sampleRate);
+                const d=buf.getChannelData(0);
+                for(let i=0;i<bufSize;i++) d[i]=Math.random()*2-1;
+                const src=ctx.createBufferSource(); src.buffer=buf;
+                const lpf=ctx.createBiquadFilter(); lpf.type='lowpass';
+                lpf.frequency.setValueAtTime(3000,now);
+                lpf.frequency.exponentialRampToValueAtTime(280,now+0.08);
+                const g=ctx.createGain();
+                g.gain.setValueAtTime(0.95,now);
+                g.gain.exponentialRampToValueAtTime(0.001,now+0.28);
+                src.connect(lpf); lpf.connect(g); g.connect(masterGain);
+                src.start(now); src.stop(now+0.35);
+                const sub=ctx.createOscillator(), sg=ctx.createGain();
+                sub.connect(sg); sg.connect(masterGain);
+                sub.type='sine';
+                sub.frequency.setValueAtTime(180,now);
+                sub.frequency.exponentialRampToValueAtTime(32,now+0.20);
+                sg.gain.setValueAtTime(0.95,now);
+                sg.gain.exponentialRampToValueAtTime(0.001,now+0.24);
+                sub.start(now); sub.stop(now+0.28);
+            },
+            cyber(ctx) {
+                // サイバー: ソウ波スイープ + グリッチ
+                const now = ctx.currentTime;
+                const osc=ctx.createOscillator();
+                const dist=ctx.createWaveShaper();
+                const curve=new Float32Array(256);
+                for(let i=0;i<256;i++){const x=i*2/255-1; curve[i]=x<0?-Math.pow(-x,0.6):Math.pow(x,0.6);}
+                dist.curve=curve;
+                const g=ctx.createGain();
+                osc.connect(dist); dist.connect(g); g.connect(masterGain);
+                osc.type='sawtooth';
+                osc.frequency.setValueAtTime(55,now);
+                osc.frequency.exponentialRampToValueAtTime(1100,now+0.14);
+                osc.frequency.exponentialRampToValueAtTime(380,now+0.28);
+                g.gain.setValueAtTime(0,now);
+                g.gain.linearRampToValueAtTime(0.38,now+0.01);
+                g.gain.setValueAtTime(0.38,now+0.11);
+                g.gain.linearRampToValueAtTime(0.12,now+0.15);
+                g.gain.linearRampToValueAtTime(0.28,now+0.18);
+                g.gain.exponentialRampToValueAtTime(0.001,now+0.48);
+                osc.start(now); osc.stop(now+0.52);
+                const osc2=ctx.createOscillator(), g2=ctx.createGain();
+                osc2.connect(g2); g2.connect(masterGain);
+                osc2.type='square';
+                osc2.frequency.setValueAtTime(3200,now+0.14);
+                osc2.frequency.setValueAtTime(1600,now+0.20);
+                osc2.frequency.setValueAtTime(2400,now+0.25);
+                g2.gain.setValueAtTime(0,now+0.14);
+                g2.gain.linearRampToValueAtTime(0.07,now+0.145);
+                g2.gain.exponentialRampToValueAtTime(0.001,now+0.38);
+                osc2.start(now+0.14); osc2.stop(now+0.4);
+            },
+            sparring(ctx) {
+                // ボクシングベル: インパクト + 持続するリング音
+                const now = ctx.currentTime;
+                const cBuf=ctx.createBuffer(1,Math.floor(ctx.sampleRate*0.018),ctx.sampleRate);
+                const cd=cBuf.getChannelData(0);
+                for(let i=0;i<cd.length;i++) cd[i]=Math.random()*2-1;
+                const click=ctx.createBufferSource(); click.buffer=cBuf;
+                const bpf=ctx.createBiquadFilter(); bpf.type='bandpass';
+                bpf.frequency.value=5000; bpf.Q.value=0.4;
+                const cg=ctx.createGain();
+                cg.gain.setValueAtTime(0.65,now);
+                cg.gain.exponentialRampToValueAtTime(0.001,now+0.018);
+                click.connect(bpf); bpf.connect(cg); cg.connect(masterGain);
+                click.start(now);
+                [[520,0.38,2.0],[1040,0.20,1.3],[1560,0.12,0.85],[2080,0.07,0.55]].forEach(([freq,amp,decay])=>{
+                    const osc=ctx.createOscillator(), g=ctx.createGain();
+                    osc.connect(g); g.connect(masterGain);
+                    osc.type='sine'; osc.frequency.value=freq;
+                    g.gain.setValueAtTime(amp,now);
+                    g.gain.exponentialRampToValueAtTime(0.001,now+decay);
+                    osc.start(now); osc.stop(now+decay+0.05);
+                });
+            },
+            hiphop(ctx) {
+                // 808キック + スネア + ハイハット
+                const now = ctx.currentTime;
+                const kick=ctx.createOscillator(), kg=ctx.createGain();
+                kick.connect(kg); kg.connect(masterGain);
+                kick.type='sine';
+                kick.frequency.setValueAtTime(165,now);
+                kick.frequency.exponentialRampToValueAtTime(32,now+0.38);
+                kg.gain.setValueAtTime(1.0,now);
+                kg.gain.exponentialRampToValueAtTime(0.001,now+0.48);
+                kick.start(now); kick.stop(now+0.52);
+                const mkBuf=(dur)=>{const b=ctx.createBuffer(1,Math.floor(ctx.sampleRate*dur),ctx.sampleRate);const d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;return b;};
+                const sTime=now+0.30;
+                const snare=ctx.createBufferSource(); snare.buffer=mkBuf(0.12);
+                const hpf=ctx.createBiquadFilter(); hpf.type='highpass'; hpf.frequency.value=1800;
+                const sGain=ctx.createGain();
+                sGain.gain.setValueAtTime(0.6,sTime);
+                sGain.gain.exponentialRampToValueAtTime(0.001,sTime+0.10);
+                snare.connect(hpf); hpf.connect(sGain); sGain.connect(masterGain);
+                snare.start(sTime);
+                const hTime=now+0.15;
+                const hat=ctx.createBufferSource(); hat.buffer=mkBuf(0.04);
+                const hhpf=ctx.createBiquadFilter(); hhpf.type='highpass'; hhpf.frequency.value=9000;
+                const hGain=ctx.createGain();
+                hGain.gain.setValueAtTime(0.18,hTime);
+                hGain.gain.exponentialRampToValueAtTime(0.001,hTime+0.032);
+                hat.connect(hhpf); hhpf.connect(hGain); hGain.connect(masterGain);
+                hat.start(hTime);
+            }
+        };
+
+        function selectSound(name, card) {
+            selectedSound = name;
+            document.querySelectorAll('.sound-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            document.getElementById('uploadZone').classList.remove('selected-sound');
+        }
+        function selectCustomSound() {
+            if (!customAudioBuffer) return;
+            selectedSound = 'custom';
+            document.querySelectorAll('.sound-card').forEach(c => c.classList.remove('selected'));
+            document.getElementById('uploadZone').classList.add('selected-sound');
+        }
+        function previewSound(e, name) {
+            e.stopPropagation(); initAudio();
+            const btn = document.getElementById('prev-' + name);
+            btn.classList.add('playing'); btn.textContent = '▶ ...';
+            sounds[name](audioCtx);
+            setTimeout(() => { btn.classList.remove('playing'); btn.textContent = '▶ Play'; }, 800);
+        }
+        function previewCustomSound(e) { e.stopPropagation(); if (!customAudioBuffer) return; initAudio(); playCustomBuffer(); }
+        function playCustomBuffer() {
+            const src = audioCtx.createBufferSource();
+            src.buffer = customAudioBuffer; src.connect(masterGain); src.start(0);
+        }
+        function playAlert() {
+            initAudio();
+            if (selectedSound === 'custom' && customAudioBuffer) playCustomBuffer();
+            else sounds[selectedSound](audioCtx);
+        }
+
+        // ── File upload ──────────────────────────────────────────────
+        function handleFileLoad(file) {
+            if (!file || !file.type.startsWith('audio/')) return;
+            initAudio();
+            const reader = new FileReader();
+            reader.onload = e => {
+                audioCtx.decodeAudioData(e.target.result).then(buf => {
+                    customAudioBuffer = buf;
+                    document.getElementById('uploadIcon').textContent = '🎧';
+                    document.getElementById('uploadTitle').textContent = 'カスタム音声';
+                    const n = document.getElementById('uploadFilename');
+                    n.textContent = file.name; n.style.display = 'block';
+                    document.getElementById('uploadHint').textContent = 'クリックで変更';
+                    document.getElementById('uploadPreviewBtn').style.display = 'block';
+                    document.getElementById('uploadZone').classList.add('loaded');
+                    selectCustomSound();
+                }).catch(() => { document.getElementById('uploadHint').textContent = '読み込み失敗'; });
+            };
+            reader.readAsArrayBuffer(file);
+        }
+        document.getElementById('uploadZone').addEventListener('click', () => document.getElementById('audioUpload').click());
+        document.getElementById('audioUpload').addEventListener('change', e => handleFileLoad(e.target.files[0]));
+        const zone = document.getElementById('uploadZone');
+        zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+        zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+        zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('dragover'); handleFileLoad(e.dataTransfer.files[0]); });
+
+        // ── Timer ────────────────────────────────────────────────────
+        let timerInterval = null;
+        let elapsedInterval = null;
+        let countdownValue = 0;
+        let totalSeconds = 0;
+        let alertCount = 0;
+        let elapsedSeconds = 0;
+        let timerState = 'idle';
+        let sequence = [];
+        let seqStepIdx = 0;
+        let seqRepCount = 0;
+        let seqLoopMode = false;
+
+        function getIntervalSeconds() {
+            const h = Math.max(0,Math.min(23,parseInt(document.getElementById('hours').value)||0));
+            const m = Math.max(0,Math.min(59,parseInt(document.getElementById('minutes').value)||0));
+            const s = Math.max(0,Math.min(59,parseInt(document.getElementById('seconds').value)||0));
+            return h*3600+m*60+s;
+        }
+        function formatTime(sec) { return `${pad(Math.floor(sec/3600))}:${pad(Math.floor((sec%3600)/60))}:${pad(sec%60)}`; }
+        function formatElapsed(sec) { return `${pad(Math.floor(sec/60))}:${pad(sec%60)}`; }
+
+        function spin(id, delta) {
+            const el = document.getElementById(id);
+            const max = id==='hours' ? 23 : 59;
+            let val = (parseInt(el.value)||0)+delta;
+            if (val<0) val=max; if (val>max) val=0;
+            el.value = val;
+        }
+        function spinInput(id, delta, max) {
+            const el = document.getElementById(id);
+            let val = (parseInt(el.value)||0)+delta;
+            if (val<0) val=max; if (val>max) val=0;
+            el.value = val;
+        }
+        function setPreset(h, m, s) {
+            document.getElementById('hours').value = h;
+            document.getElementById('minutes').value = m;
+            document.getElementById('seconds').value = s;
+        }
+        function updateProgress() {
+            if (totalSeconds===0) return;
+            document.getElementById('progressFill').style.width = ((totalSeconds-countdownValue)/totalSeconds*100)+'%';
+        }
+        function resetProgress() {
+            const f = document.getElementById('progressFill');
+            f.style.transition='none'; f.style.width='0%';
+            requestAnimationFrame(() => { f.style.transition='width 0.95s linear'; });
+        }
+        function triggerAlert() {
+            alertCount++;
+            document.getElementById('alertCount').textContent = alertCount;
+            const cd = document.getElementById('countdown');
+            cd.classList.add('alerting');
+            setTimeout(() => cd.classList.remove('alerting'), 800);
+            flashOverlay();
+            playAlert();
+            resetProgress();
+            if (sequence.length > 0) {
+                seqRepCount++;
+                if (seqRepCount >= sequence[seqStepIdx].reps) {
+                    seqStepIdx++;
+                    seqRepCount = 0;
+                    if (seqStepIdx >= sequence.length) {
+                        if (seqLoopMode) {
+                            seqStepIdx = 0;
+                            seqRepCount = 0;
+                            totalSeconds = sequence[0].totalSec;
+                        } else {
+                            stopTimer();
+                            document.getElementById('statusText').textContent = 'Complete!';
+                            document.getElementById('statusDot').className = 'status-dot running';
+                            return;
+                        }
+                    }
+                    totalSeconds = sequence[seqStepIdx].totalSec;
+                }
+                renderSeqList();
+                updateSeqStatus();
+            }
+        }
+        function setTimerInputsDisabled(disabled) {
+            ['hours','minutes','seconds','repsInput'].forEach(id => document.getElementById(id).disabled=disabled);
+            ['hUp','hDown','mUp','mDown','sUp','sDown','repsUp','repsDown'].forEach(id => document.getElementById(id).disabled=disabled);
+            document.querySelectorAll('.preset-btn').forEach(b => b.disabled=disabled);
+            document.getElementById('seqAddBtn').disabled = disabled;
+            document.getElementById('seqLoopBtn').disabled = disabled;
+            document.querySelectorAll('.seq-item-del').forEach(b => b.disabled=disabled);
+        }
+        function updateStartBtn() {
+            const btn = document.getElementById('startBtn');
+            if (timerState==='idle') { btn.textContent='▶ Start'; btn.classList.remove('paused'); }
+            else if (timerState==='running') { btn.textContent='⏸ Pause'; btn.classList.remove('paused'); }
+            else { btn.textContent='▶ Resume'; btn.classList.add('paused'); }
+        }
+        function handleStartBtn() {
+            if (timerState==='idle') startTimer();
+            else if (timerState==='running') pauseTimer();
+            else resumeTimer();
+        }
+        function startTimer() {
+            initAudio();
+            let total;
+            if (sequence.length > 0) {
+                seqStepIdx = 0;
+                seqRepCount = 0;
+                total = sequence[0].totalSec;
+            } else {
+                total = getIntervalSeconds();
+            }
+            if (total===0) {
+                const n=document.getElementById('soundNotice');
+                n.textContent='インターバルを1秒以上に設定してください'; n.style.display='block'; return;
+            }
+            document.getElementById('soundNotice').style.display='none';
+            totalSeconds=total; countdownValue=total; alertCount=0; elapsedSeconds=0;
+            document.getElementById('alertCount').textContent='0';
+            document.getElementById('elapsedTime').textContent='00:00';
+            document.getElementById('stopBtn').disabled=false;
+            document.getElementById('statusDot').className='status-dot running';
+            document.getElementById('statusText').textContent='Running';
+            document.getElementById('countdown').textContent=formatTime(countdownValue);
+            setTimerInputsDisabled(true);
+            timerState='running'; updateStartBtn(); resetProgress();
+            renderSeqList(); updateSeqStatus();
+            timerInterval = setInterval(() => {
+                countdownValue--;
+                document.getElementById('countdown').textContent=formatTime(countdownValue);
+                document.title=`⏱ ${formatTime(countdownValue)} — TIME HACK`;
+                updateProgress();
+                if (countdownValue<=0) { triggerAlert(); countdownValue=totalSeconds; }
+            }, 1000);
+            elapsedInterval = setInterval(() => {
+                elapsedSeconds++;
+                document.getElementById('elapsedTime').textContent=formatElapsed(elapsedSeconds);
+            }, 1000);
+        }
+        function pauseTimer() {
+            clearInterval(timerInterval); clearInterval(elapsedInterval); timerInterval=null;
+            timerState='paused';
+            document.getElementById('statusDot').className='status-dot paused';
+            document.getElementById('statusText').textContent='Paused';
+            document.title=`⏸ ${formatTime(countdownValue)} — TIME HACK`;
+            updateStartBtn();
+        }
+        function resumeTimer() {
+            timerState='running';
+            document.getElementById('statusDot').className='status-dot running';
+            document.getElementById('statusText').textContent='Running';
+            updateStartBtn();
+            timerInterval = setInterval(() => {
+                countdownValue--;
+                document.getElementById('countdown').textContent=formatTime(countdownValue);
+                document.title=`⏱ ${formatTime(countdownValue)} — TIME HACK`;
+                updateProgress();
+                if (countdownValue<=0) { triggerAlert(); countdownValue=totalSeconds; }
+            }, 1000);
+            elapsedInterval = setInterval(() => {
+                elapsedSeconds++;
+                document.getElementById('elapsedTime').textContent=formatElapsed(elapsedSeconds);
+            }, 1000);
+        }
+        function stopTimer() {
+            clearInterval(timerInterval); clearInterval(elapsedInterval); timerInterval=null;
+            timerState='idle';
+            seqStepIdx=0; seqRepCount=0;
+            document.getElementById('stopBtn').disabled=true;
+            document.getElementById('statusDot').className='status-dot';
+            document.getElementById('statusText').textContent='Standby';
+            document.getElementById('countdown').textContent='--:--:--';
+            document.getElementById('progressFill').style.width='0%';
+            document.getElementById('seqStatus').style.display='none';
+            document.title='TIME HACK — Interval Alert System';
+            setTimerInputsDisabled(false);
+            renderSeqList();
+            updateStartBtn();
+        }
+        ['hours','minutes','seconds'].forEach(id => {
+            document.getElementById(id).addEventListener('blur', () => {
+                const max=id==='hours'?23:59, el=document.getElementById(id);
+                el.value=Math.max(0,Math.min(max,parseInt(el.value)||0));
+            });
+        });
+        document.getElementById('repsInput').addEventListener('blur', () => {
+            const el=document.getElementById('repsInput');
+            el.value=Math.max(1,Math.min(99,parseInt(el.value)||1));
+        });
+
+        function toggleSeqLoop() {
+            seqLoopMode = !seqLoopMode;
+            document.getElementById('seqLoopBtn').classList.toggle('active', seqLoopMode);
+        }
+
+        function spinReps(delta) {
+            const el=document.getElementById('repsInput');
+            let val=(parseInt(el.value)||1)+delta;
+            if (val<1) val=1; if (val>99) val=99;
+            el.value=val;
+        }
+        function formatStepTime(step) {
+            const parts=[];
+            if (step.h>0) parts.push(step.h+'h');
+            if (step.m>0) parts.push(step.m+'m');
+            if (step.s>0||parts.length===0) parts.push(step.s+'s');
+            return parts.join(' ');
+        }
+        function addSeqStep() {
+            const h=Math.max(0,Math.min(23,parseInt(document.getElementById('hours').value)||0));
+            const m=Math.max(0,Math.min(59,parseInt(document.getElementById('minutes').value)||0));
+            const s=Math.max(0,Math.min(59,parseInt(document.getElementById('seconds').value)||0));
+            const reps=Math.max(1,Math.min(99,parseInt(document.getElementById('repsInput').value)||1));
+            const totalSec=h*3600+m*60+s;
+            if (totalSec===0) {
+                const n=document.getElementById('soundNotice');
+                n.textContent='インターバルを1秒以上に設定してください'; n.style.display='block'; return;
+            }
+            document.getElementById('soundNotice').style.display='none';
+            sequence.push({h,m,s,reps,totalSec});
+            renderSeqList();
+        }
+        function removeSeqStep(idx) {
+            sequence.splice(idx,1);
+            renderSeqList();
+        }
+        function renderSeqList() {
+            const container=document.getElementById('seqList');
+            if (sequence.length===0) {
+                container.innerHTML='<div class="seq-empty">ステップを追加（空のままで無限ループ）</div>';
+                return;
+            }
+            const total=sequence.reduce((a,st)=>a+st.totalSec*st.reps,0);
+            let html='';
+            sequence.forEach((st,i) => {
+                const active=(timerState!=='idle'&&i===seqStepIdx)?' seq-item-active':'';
+                const dis=timerState!=='idle'?'disabled':'';
+                html+=`<div class="seq-item${active}">
+                    <span class="seq-item-num">${i+1}</span>
+                    <span class="seq-item-info">${formatStepTime(st)} × ${st.reps}</span>
+                    <button class="seq-item-del" ${dis} onclick="removeSeqStep(${i})">×</button>
+                </div>`;
+            });
+            html+=`<div class="seq-total">Total: ${formatTime(total)}</div>`;
+            container.innerHTML=html;
+        }
+        function updateSeqStatus() {
+            const el=document.getElementById('seqStatus');
+            if (sequence.length===0||timerState==='idle'||seqStepIdx>=sequence.length) {
+                el.style.display='none'; return;
+            }
+            const st=sequence[seqStepIdx];
+            el.textContent=`STEP ${seqStepIdx+1}/${sequence.length}  ·  REP ${seqRepCount+1}/${st.reps}`;
+            el.style.display='block';
+        }
+
+        // ── Alarm ────────────────────────────────────────────────────
+        let alarmSet = false;
+        let alarmHour = 0;
+        let alarmMin = 0;
+        let alarmFired = false;
+        let alarmRingInterval = null;
+
+        function setAlarm() {
+            alarmHour = Math.max(0,Math.min(23,parseInt(document.getElementById('alarmH').value)||0));
+            alarmMin  = Math.max(0,Math.min(59,parseInt(document.getElementById('alarmM').value)||0));
+            alarmSet = true;
+            alarmFired = false;
+            document.getElementById('alarmBigTime').textContent = `${pad(alarmHour)}:${pad(alarmMin)}`;
+            document.getElementById('alarmBigTime').classList.remove('firing');
+            document.getElementById('alarmDot').className = 'status-dot alarm-on';
+            document.getElementById('alarmStatusTxt').textContent = 'Alarm Set';
+            document.getElementById('alarmSnoozeBtn').style.display = 'none';
+            document.getElementById('alarmStatus').style.display = '';
+            document.getElementById('alarmSetBtn').textContent = '✎ Edit';
+            updateAlarmCountdown();
+        }
+        function cancelAlarm() {
+            clearInterval(alarmRingInterval); alarmRingInterval=null;
+            alarmSet=false; alarmFired=false;
+            document.getElementById('alarmStatus').style.display='none';
+            document.getElementById('alarmSetBtn').textContent='⏰ Set Alarm';
+            document.getElementById('alarmNotif').classList.remove('visible');
+        }
+        function fireAlarm() {
+            alarmFired = true;
+            initAudio(); playAlert(); flashOverlay();
+            alarmRingInterval = setInterval(() => { initAudio(); playAlert(); }, 3000);
+            document.getElementById('alarmBigTime').classList.add('firing');
+            document.getElementById('alarmDot').className = 'status-dot running';
+            document.getElementById('alarmStatusTxt').textContent = 'RINGING!';
+            document.getElementById('alarmSnoozeBtn').style.display = '';
+            document.getElementById('alarmCountdownText').textContent = 'ALARM!';
+            document.getElementById('alarmNotifTime').textContent = `${pad(alarmHour)}:${pad(alarmMin)}`;
+            document.getElementById('alarmNotif').classList.add('visible');
+        }
+        function dismissAlarm() {
+            clearInterval(alarmRingInterval); alarmRingInterval=null;
+            document.getElementById('alarmNotif').classList.remove('visible');
+            cancelAlarm();
+        }
+        function snoozeAlarm() {
+            clearInterval(alarmRingInterval); alarmRingInterval=null;
+            document.getElementById('alarmNotif').classList.remove('visible');
+            const d = new Date();
+            d.setMinutes(d.getMinutes()+5);
+            alarmHour = d.getHours();
+            alarmMin  = d.getMinutes();
+            alarmFired = false;
+            document.getElementById('alarmBigTime').textContent = `${pad(alarmHour)}:${pad(alarmMin)}`;
+            document.getElementById('alarmBigTime').classList.remove('firing');
+            document.getElementById('alarmDot').className = 'status-dot alarm-on';
+            document.getElementById('alarmStatusTxt').textContent = 'Snoozed (+5m)';
+            document.getElementById('alarmSnoozeBtn').style.display='none';
+            document.getElementById('alarmH').value = alarmHour;
+            document.getElementById('alarmM').value = alarmMin;
+        }
+        function updateAlarmCountdown() {
+            if (!alarmSet || alarmFired) return;
+            const now = new Date();
+            const target = new Date(now);
+            target.setHours(alarmHour, alarmMin, 0, 0);
+            if (target <= now) target.setDate(target.getDate()+1);
+            const diff = Math.floor((target - now) / 1000);
+            const h = Math.floor(diff/3600), m = Math.floor((diff%3600)/60), s = diff%60;
+            const tomorrow = target.getDate() !== now.getDate();
+            document.getElementById('alarmCountdownText').textContent =
+                (tomorrow ? '明日 ' : '') + `in ${h>0?h+'h ':''}${m}m ${s}s`;
+        }
+
+        // ── Stopwatch ────────────────────────────────────────────────
+        let swRunning = false;
+        let swStartMs = null;
+        let swElapsedMs = 0;
+        let swInterval = null;
+        let swLaps = [];
+        let swState = 'idle'; // 'idle' | 'running' | 'paused'
+
+        function formatSW(ms) {
+            const h = Math.floor(ms/3600000);
+            const m = Math.floor((ms%3600000)/60000);
+            const s = Math.floor((ms%60000)/1000);
+            const cs = Math.floor((ms%1000)/10);
+            return {
+                main: h>0 ? `${pad(h)}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`,
+                cs: pad(cs)
+            };
+        }
+        function formatSWLap(ms) {
+            const m=Math.floor(ms/60000), s=Math.floor((ms%60000)/1000), cs=Math.floor((ms%1000)/10);
+            return `${pad(m)}:${pad(s)}.${pad(cs)}`;
+        }
+        function swGetTotal() {
+            return swElapsedMs + (swRunning && swStartMs ? Date.now()-swStartMs : 0);
+        }
+        function swUpdateDisplay() {
+            const f = formatSW(swGetTotal());
+            document.getElementById('swMain').textContent = f.main;
+            document.getElementById('swCs').textContent = '.' + f.cs;
+        }
+        function swUpdateButtons() {
+            const s = document.getElementById('swStartBtn');
+            const r = document.getElementById('swResetBtn');
+            const l = document.getElementById('swLapBtn');
+            if (swState==='idle') {
+                s.textContent='▶ Start'; s.classList.remove('paused');
+                r.disabled=true; l.disabled=true;
+            } else if (swState==='running') {
+                s.textContent='⏸ Pause'; s.classList.remove('paused');
+                r.disabled=true; l.disabled=false;
+            } else {
+                s.textContent='▶ Resume'; s.classList.add('paused');
+                r.disabled=false; l.disabled=true;
+            }
+        }
+        function swHandleStart() {
+            if (swState==='idle') swStart();
+            else if (swState==='running') swPause();
+            else swResume();
+        }
+        function swStart() {
+            swElapsedMs=0; swLaps=[]; swStartMs=Date.now(); swRunning=true; swState='running';
+            document.getElementById('swDot').className='status-dot running';
+            document.getElementById('swStatus').textContent='Running';
+            document.getElementById('swLapList').innerHTML='<div class="sw-empty" id="swEmpty">No laps recorded</div>';
+            swUpdateButtons();
+            swInterval = setInterval(swUpdateDisplay, 50);
+        }
+        function swPause() {
+            swElapsedMs += Date.now()-swStartMs; swRunning=false; swState='paused';
+            clearInterval(swInterval);
+            document.getElementById('swDot').className='status-dot paused';
+            document.getElementById('swStatus').textContent='Paused';
+            swUpdateButtons(); swUpdateDisplay();
+        }
+        function swResume() {
+            swStartMs=Date.now(); swRunning=true; swState='running';
+            document.getElementById('swDot').className='status-dot running';
+            document.getElementById('swStatus').textContent='Running';
+            swUpdateButtons();
+            swInterval = setInterval(swUpdateDisplay, 50);
+        }
+        function swReset() {
+            clearInterval(swInterval); swRunning=false; swState='idle';
+            swElapsedMs=0; swStartMs=null; swLaps=[];
+            document.getElementById('swDot').className='status-dot';
+            document.getElementById('swStatus').textContent='Ready';
+            document.getElementById('swMain').textContent='00:00';
+            document.getElementById('swCs').textContent='.00';
+            document.getElementById('swLapList').innerHTML='<div class="sw-empty" id="swEmpty">No laps recorded</div>';
+            swUpdateButtons();
+        }
+        function swLap() {
+            if (swState!=='running') return;
+            const total = swGetTotal();
+            const prev = swLaps.length ? swLaps[swLaps.length-1].total : 0;
+            swLaps.push({ total, split: total-prev });
+            renderLaps();
+        }
+        function renderLaps() {
+            if (swLaps.length===0) {
+                document.getElementById('swLapList').innerHTML='<div class="sw-empty">No laps recorded</div>';
+                return;
+            }
+            const splits = swLaps.map(l=>l.split);
+            const best = Math.min(...splits);
+            const worst = splits.length>1 ? Math.max(...splits) : -1;
+            let html = `<div class="sw-lap-header"><span>#</span><span>Split</span><span>Total</span></div>`;
+            for (let i=swLaps.length-1; i>=0; i--) {
+                const l = swLaps[i];
+                let cls = '';
+                if (splits.length>1) {
+                    if (l.split===best) cls='best';
+                    else if (l.split===worst) cls='worst';
+                }
+                html += `<div class="sw-lap-row ${cls}">
+                    <span class="sw-lap-num">${i+1}</span>
+                    <span class="sw-lap-split">${formatSWLap(l.split)}</span>
+                    <span class="sw-lap-total">${formatSWLap(l.total)}</span>
+                </div>`;
+            }
+            document.getElementById('swLapList').innerHTML = html;
+        }
+
+        // ── Keyboard shortcuts ───────────────────────────────────────
+        document.addEventListener('keydown', e => {
+            if (e.target.tagName==='INPUT') return;
+            if (e.code==='Space') {
+                e.preventDefault();
+                if (currentTab==='timer') handleStartBtn();
+                else if (currentTab==='sw') swHandleStart();
+            } else if (e.code==='KeyL') {
+                if (currentTab==='sw') swLap();
+            } else if (e.code==='Escape') {
+                if (currentTab==='timer' && timerState!=='idle') stopTimer();
+                else if (currentTab==='sw' && swState!=='idle') swReset();
+                else if (currentTab==='alarm' && alarmSet) cancelAlarm();
+            }
+        });
+
+        // ── Clock + alarm check ──────────────────────────────────────
+        const canvas = document.getElementById('analogClock');
+        const ctx2d = canvas.getContext('2d');
+
+        function drawHand(cx,cy,angle,length,tail,width,color,glow) {
+            ctx2d.save(); ctx2d.translate(cx,cy); ctx2d.rotate(angle);
+            ctx2d.beginPath(); ctx2d.moveTo(0,tail); ctx2d.lineTo(0,-length);
+            ctx2d.strokeStyle=color; ctx2d.lineWidth=width; ctx2d.lineCap='round';
+            if(glow){ctx2d.shadowColor=color; ctx2d.shadowBlur=12;}
+            ctx2d.stroke(); ctx2d.restore();
+        }
+        function drawClock() {
+            const W=canvas.width,H=canvas.height,cx=W/2,cy=H/2,R=Math.min(W,H)/2-8;
+            const now=new Date(),h=now.getHours()%12,m=now.getMinutes(),s=now.getSeconds();
+            ctx2d.clearRect(0,0,W,H);
+            ctx2d.fillStyle='#080808'; ctx2d.fillRect(0,0,W,H);
+            const grad=ctx2d.createRadialGradient(cx,cy-R*0.25,R*0.05,cx,cy,R);
+            grad.addColorStop(0,'#1e1e1e'); grad.addColorStop(0.6,'#101010'); grad.addColorStop(1,'#060606');
+            ctx2d.beginPath(); ctx2d.arc(cx,cy,R,0,Math.PI*2); ctx2d.fillStyle=grad; ctx2d.fill();
+            ctx2d.beginPath(); ctx2d.arc(cx,cy,R,0,Math.PI*2);
+            ctx2d.strokeStyle='rgba(255,255,255,0.22)'; ctx2d.lineWidth=2;
+            ctx2d.shadowColor='rgba(255,255,255,0.5)'; ctx2d.shadowBlur=8; ctx2d.stroke(); ctx2d.shadowBlur=0;
+            for(let i=0;i<60;i++){
+                const a=(i/60)*Math.PI*2-Math.PI/2,isH=i%5===0;
+                ctx2d.beginPath();
+                ctx2d.moveTo(cx+Math.cos(a)*(R-2),cy+Math.sin(a)*(R-2));
+                ctx2d.lineTo(cx+Math.cos(a)*(isH?R-18:R-8),cy+Math.sin(a)*(isH?R-18:R-8));
+                ctx2d.strokeStyle=isH?'rgba(240,240,240,0.85)':'rgba(240,240,240,0.22)';
+                ctx2d.lineWidth=isH?2.5:1; ctx2d.lineCap='round'; ctx2d.shadowBlur=0; ctx2d.stroke();
+            }
+            const fs=Math.round(R*0.17);
+            ctx2d.font=`600 ${fs}px -apple-system,'Helvetica Neue',Arial,sans-serif`;
+            ctx2d.textAlign='center'; ctx2d.textBaseline='middle';
+            ctx2d.fillStyle='rgba(240,240,240,0.92)'; ctx2d.shadowBlur=0;
+            for(let i=1;i<=12;i++){
+                const a=(i/12)*Math.PI*2-Math.PI/2,nr=R-34;
+                ctx2d.fillText(String(i),cx+Math.cos(a)*nr,cy+Math.sin(a)*nr);
+            }
+            drawHand(cx,cy,((h+m/60+s/3600)/12)*Math.PI*2-Math.PI/2,R*0.52,-R*0.1,7,'rgba(240,240,240,0.95)',false);
+            drawHand(cx,cy,((m+s/60)/60)*Math.PI*2-Math.PI/2,R*0.76,-R*0.12,4.5,'rgba(240,240,240,0.95)',false);
+            drawHand(cx,cy,(s/60)*Math.PI*2-Math.PI/2,R*0.83,-R*0.22,2,'#ffffff',true);
+            ctx2d.beginPath(); ctx2d.arc(cx,cy,9,0,Math.PI*2);
+            ctx2d.fillStyle='#ffffff'; ctx2d.shadowColor='#ffffff'; ctx2d.shadowBlur=12; ctx2d.fill(); ctx2d.shadowBlur=0;
+            ctx2d.beginPath(); ctx2d.arc(cx,cy,4,0,Math.PI*2);
+            ctx2d.fillStyle='rgba(240,240,240,0.95)'; ctx2d.fill();
+        }
+        function updateClock() {
+            const now = new Date();
+            const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+            document.getElementById('clockTime').textContent =
+                `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+            document.getElementById('clockYear').textContent = now.getFullYear();
+            document.getElementById('clockMonthDay').textContent =
+                `${pad(now.getMonth()+1)}/${pad(now.getDate())}`;
+            document.getElementById('clockDOW').textContent = days[now.getDay()];
+            drawClock();
+            // Alarm check
+            if (alarmSet && !alarmFired) {
+                if (now.getHours()===alarmHour && now.getMinutes()===alarmMin) fireAlarm();
+                else updateAlarmCountdown();
+            }
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+    </script>
+</body>
+</html>
