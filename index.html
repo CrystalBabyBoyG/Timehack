@@ -853,13 +853,13 @@
                             <button class="preview-btn" id="prev-trader" onclick="previewSound(event,'trader')">▶ Play</button>
                         </div>
                         <div class="sound-card" id="sound-gym" onclick="selectSound('gym',this)">
-                            <div class="sound-icon">📯</div>
-                            <div class="sound-name">Buzzer</div>
+                            <div class="sound-icon">🔫</div>
+                            <div class="sound-name">銃</div>
                             <button class="preview-btn" id="prev-gym" onclick="previewSound(event,'gym')">▶ Play</button>
                         </div>
                         <div class="sound-card" id="sound-car" onclick="selectSound('car',this)">
-                            <div class="sound-icon">🚨</div>
-                            <div class="sound-name">Siren</div>
+                            <div class="sound-icon">💰</div>
+                            <div class="sound-name">Money</div>
                             <button class="preview-btn" id="prev-car" onclick="previewSound(event,'car')">▶ Play</button>
                         </div>
                         <div class="sound-card" id="sound-boxing" onclick="selectSound('boxing',this)">
@@ -946,8 +946,8 @@
                     <div class="section-label" data-i18n="lbl_sound">Sound</div>
                     <div class="sound-grid" id="alarmSoundGrid">
                         <div class="sound-card selected" id="asound-trader" onclick="selectAlarmSound('trader',this)"><div class="sound-icon">📈</div><div class="sound-name">Trader</div></div>
-                        <div class="sound-card" id="asound-gym" onclick="selectAlarmSound('gym',this)"><div class="sound-icon">📯</div><div class="sound-name">Buzzer</div></div>
-                        <div class="sound-card" id="asound-car" onclick="selectAlarmSound('car',this)"><div class="sound-icon">🚨</div><div class="sound-name">Siren</div></div>
+                        <div class="sound-card" id="asound-gym" onclick="selectAlarmSound('gym',this)"><div class="sound-icon">🔫</div><div class="sound-name">銃</div></div>
+                        <div class="sound-card" id="asound-car" onclick="selectAlarmSound('car',this)"><div class="sound-icon">💰</div><div class="sound-name">Money</div></div>
                         <div class="sound-card" id="asound-boxing" onclick="selectAlarmSound('boxing',this)"><div class="sound-icon">🥊</div><div class="sound-name">Boxing</div></div>
                         <div class="sound-card" id="asound-space" onclick="selectAlarmSound('space',this)"><div class="sound-icon">🚀</div><div class="sound-name">Space</div></div>
                     </div>
@@ -1175,40 +1175,43 @@
                 });
             },
             gym(ctx) {
-                // ゲームブザー — ハードクリップした矩形波でざらついた電子ブザー音
+                // 銃声 — ノイズ爆発 + 低域ドン
                 const now = ctx.currentTime;
-                const osc=ctx.createOscillator(), dist=ctx.createWaveShaper(), g=ctx.createGain();
-                const curve=new Float32Array(512);
-                for(let i=0;i<512;i++){const x=i*2/511-1; curve[i]=Math.max(-0.55,Math.min(0.55,x*12))/0.55;}
-                dist.curve=curve;
-                osc.type='sine'; osc.frequency.value=155;
-                g.gain.setValueAtTime(0,now); g.gain.linearRampToValueAtTime(0.72,now+0.008);
-                g.gain.setValueAtTime(0.70,now+0.55); g.gain.exponentialRampToValueAtTime(0.001,now+0.70);
-                osc.connect(dist); dist.connect(g); g.connect(masterGain); osc.start(now); osc.stop(now+0.75);
-                // 上倍音層 (ブザーのギラつき)
-                const osc2=ctx.createOscillator(), g2=ctx.createGain();
-                osc2.type='square'; osc2.frequency.value=310;
-                g2.gain.setValueAtTime(0,now); g2.gain.linearRampToValueAtTime(0.12,now+0.01);
-                g2.gain.setValueAtTime(0.11,now+0.50); g2.gain.exponentialRampToValueAtTime(0.001,now+0.68);
-                osc2.connect(g2); g2.connect(masterGain); osc2.start(now); osc2.stop(now+0.72);
+                const sr = ctx.sampleRate;
+                const buf = ctx.createBuffer(1, Math.floor(sr*0.28), sr);
+                const d = buf.getChannelData(0);
+                for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2.5);
+                const noise=ctx.createBufferSource(); noise.buffer=buf;
+                const hpf=ctx.createBiquadFilter(); hpf.type='highpass'; hpf.frequency.value=300;
+                const ng=ctx.createGain();
+                ng.gain.setValueAtTime(1.4,now); ng.gain.exponentialRampToValueAtTime(0.001,now+0.22);
+                noise.connect(hpf); hpf.connect(ng); ng.connect(masterGain); noise.start(now);
+                // 低音ドン (銃床の衝撃)
+                const osc=ctx.createOscillator(), g=ctx.createGain();
+                osc.type='sine';
+                osc.frequency.setValueAtTime(130,now); osc.frequency.exponentialRampToValueAtTime(35,now+0.18);
+                g.gain.setValueAtTime(0.9,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.22);
+                osc.connect(g); g.connect(masterGain); osc.start(now); osc.stop(now+0.25);
             },
             car(ctx) {
-                // 緊急サイレン — 鋸波が700Hz↔1400Hzをスイープ (ウーウー1サイクル)
+                // マネー — コイン打撃 + レジスターチャリン上昇
                 const now = ctx.currentTime;
-                const osc=ctx.createOscillator(), g=ctx.createGain();
-                osc.type='sawtooth';
-                osc.frequency.setValueAtTime(700,now);
-                osc.frequency.linearRampToValueAtTime(1400,now+0.38);
-                osc.frequency.linearRampToValueAtTime(700,now+0.76);
-                g.gain.setValueAtTime(0,now); g.gain.linearRampToValueAtTime(0.48,now+0.018);
-                g.gain.setValueAtTime(0.46,now+0.68); g.gain.exponentialRampToValueAtTime(0.001,now+0.85);
-                osc.connect(g); g.connect(masterGain); osc.start(now); osc.stop(now+0.90);
-                // 低域厚み (実際のサイレンは車体共鳴で低音も出る)
-                const sub=ctx.createOscillator(), sg=ctx.createGain();
-                sub.type='sine'; sub.frequency.setValueAtTime(350,now); sub.frequency.linearRampToValueAtTime(700,now+0.38); sub.frequency.linearRampToValueAtTime(350,now+0.76);
-                sg.gain.setValueAtTime(0,now); sg.gain.linearRampToValueAtTime(0.20,now+0.02);
-                sg.gain.exponentialRampToValueAtTime(0.001,now+0.82);
-                sub.connect(sg); sg.connect(masterGain); sub.start(now); sub.stop(now+0.88);
+                const sr = ctx.sampleRate;
+                const buf=ctx.createBuffer(1,Math.floor(sr*0.04),sr);
+                const d=buf.getChannelData(0);
+                for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+                const noise=ctx.createBufferSource(); noise.buffer=buf;
+                const bpf=ctx.createBiquadFilter(); bpf.type='bandpass'; bpf.frequency.value=5500; bpf.Q.value=2;
+                const ng=ctx.createGain();
+                ng.gain.setValueAtTime(0.7,now); ng.gain.exponentialRampToValueAtTime(0.001,now+0.04);
+                noise.connect(bpf); bpf.connect(ng); ng.connect(masterGain); noise.start(now);
+                // チャリン上昇音 (レジスター風)
+                [[1047,0,0.38],[1319,0.07,0.32],[1568,0.14,0.28],[2093,0.23,0.45]].forEach(([f,delay,dec])=>{
+                    const o=ctx.createOscillator(), g=ctx.createGain();
+                    o.type='sine'; o.frequency.value=f;
+                    g.gain.setValueAtTime(0.38,now+delay); g.gain.exponentialRampToValueAtTime(0.001,now+delay+dec);
+                    o.connect(g); g.connect(masterGain); o.start(now+delay); o.stop(now+delay+dec+0.05);
+                });
             },
             boxing(ctx) {
                 // ボクシングベル — 打撃クリック + 複数サイン倍音の長い余韻
@@ -1667,7 +1670,7 @@
         let alarmIdCounter = 0;
         let alarms = [];
         let firingAlarmId = null;
-        const ALARM_SOUND_ICONS = { trader:'📈', gym:'📯', car:'🚨', boxing:'🥊', space:'🚀', custom:'🎵' };
+        const ALARM_SOUND_ICONS = { trader:'📈', gym:'🔫', car:'💰', boxing:'🥊', space:'🚀', custom:'🎵' };
 
         function selectAlarmSound(name, card) {
             alarmSelectedSound = name;
