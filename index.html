@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TIME HACK — タイマー・アラーム・世界時計・インターバルタイマー</title>
-    <meta name="description" content="TIME HACK はタイマー・インターバルタイマー・アラーム・ストップウォッチ・世界時計をひとつにまとめた無料Webアプリです。トレーニング・作業・瞑想・ポモドーロなどに最適。">
-    <meta name="keywords" content="タイムハック,time hack,タイマー,インターバルタイマー,アラーム,ストップウォッチ,世界時計,時計,カウントダウン,ポモドーロ,インターバル,オンラインタイマー,無料タイマー,トレーニングタイマー">
+    <title>TIME HACK — 筋トレ・インターバルタイマー｜無料トレーニングタイマー</title>
+    <meta name="description" content="筋トレ・HIIT・サーキットトレーニングに最適な無料インターバルタイマー。セット数・休憩時間を自由に設定できます。タイマー・アラーム・ストップウォッチ・世界時計も搭載。">
+    <meta name="keywords" content="筋トレタイマー,インターバルタイマー,筋トレ,HIIT,サーキットトレーニング,トレーニングタイマー,筋トレ休憩タイマー,ジムタイマー,無料タイマー,インターバル,タイムハック,time hack,timeshacker,タイマー,アラーム,ストップウォッチ,ポモドーロ,カウントダウン">
     <meta name="author" content="TIME HACK">
     <meta name="robots" content="index, follow">
     <meta name="google-site-verification" content="G7mJTTNhhd6casCm9MjnalmNuq1ictgfabgq99YwHvA" />
@@ -13,8 +13,8 @@
     <link rel="canonical" href="https://timeshacker.com/">
 
     <!-- OGP（SNSシェア用） -->
-    <meta property="og:title" content="TIME HACK — タイマー・アラーム・世界時計">
-    <meta property="og:description" content="タイマー・インターバルタイマー・アラーム・ストップウォッチ・世界時計を1ページで使える無料Webアプリ">
+    <meta property="og:title" content="TIME HACK — 筋トレ・インターバルタイマー｜無料トレーニングタイマー">
+    <meta property="og:description" content="筋トレ・HIIT・サーキットトレーニングに最適な無料インターバルタイマー。タイマー・アラーム・ストップウォッチ・世界時計も搭載。">
     <meta property="og:url" content="https://timeshacker.com/">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="ja_JP">
@@ -26,11 +26,11 @@
       "@type": "WebApplication",
       "name": "TIME HACK",
       "url": "https://timeshacker.com/",
-      "description": "タイマー・インターバルタイマー・アラーム・ストップウォッチ・世界時計を1ページで使える無料Webアプリ",
-      "applicationCategory": "UtilitiesApplication",
+      "description": "筋トレ・HIIT・サーキットトレーニングに最適な無料インターバルタイマー。タイマー・アラーム・ストップウォッチ・世界時計も搭載。",
+      "applicationCategory": "HealthApplication",
       "operatingSystem": "Web",
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" },
-      "keywords": "タイマー, インターバルタイマー, アラーム, ストップウォッチ, 世界時計, カウントダウン"
+      "keywords": "筋トレタイマー, インターバルタイマー, 筋トレ, HIIT, サーキットトレーニング, トレーニングタイマー, ジムタイマー"
     }
     </script>
 
@@ -768,7 +768,7 @@
             <nav class="sidebar">
                 <div class="nav-item active" id="nav-timer" onclick="switchTab('timer')">
                     <span class="nav-icon">⏱</span>
-                    <span class="nav-label" data-i18n="nav_timer">Timer</span>
+                    <span class="nav-label" data-i18n="nav_timer">Interval</span>
                 </div>
                 <div class="nav-item" id="nav-alarm" onclick="switchTab('alarm')">
                     <span class="nav-icon">⏰</span>
@@ -1032,7 +1032,7 @@
         // ── i18n ─────────────────────────────────────────────────────
         const LANGS = {
             en: {
-                nav_timer:'Timer', nav_alarm:'Alarm', nav_sw:'Watch', nav_world:'World',
+                nav_timer:'Interval', nav_alarm:'Alarm', nav_sw:'Watch', nav_world:'World',
                 lbl_interval:'Interval', lbl_sequence:'Sequence', lbl_sound:'Sound',
                 lbl_next_alert:'Next Alert', lbl_alarm_time:'Alarm Time',
                 lbl_notif_msg:'Notification Message', lbl_world_clock:'World Clock', lbl_laps:'Laps',
@@ -1054,7 +1054,7 @@
                 alarm_label:'⏰ ALARM', alarm_snoozed:'Snoozed (+5m)',
             },
             ja: {
-                nav_timer:'タイマー', nav_alarm:'アラーム', nav_sw:'ストップウォッチ', nav_world:'世界時計',
+                nav_timer:'インターバル', nav_alarm:'アラーム', nav_sw:'ストップウォッチ', nav_world:'世界時計',
                 lbl_interval:'インターバル', lbl_sequence:'シーケンス', lbl_sound:'サウンド',
                 lbl_next_alert:'次のアラート', lbl_alarm_time:'アラーム時刻',
                 lbl_notif_msg:'通知メッセージ', lbl_world_clock:'世界時計', lbl_laps:'ラップ',
