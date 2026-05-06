@@ -621,6 +621,29 @@
         .lang-btn.active { background: rgba(255,255,255,0.15); color: var(--accent); }
         .lang-divider { width: 1px; background: rgba(255,255,255,0.18); flex-shrink: 0; }
 
+        /* ── Theme switcher ── */
+        .theme-toggle { position: fixed; top: 1rem; right: 8rem; z-index: 200; }
+        .theme-toggle-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.18); border-radius: 8px; color: var(--text-dim); font-size: 0.85rem; padding: 0.3rem 0.6rem; cursor: pointer; transition: all 0.15s; }
+        .theme-toggle-btn:hover { background: rgba(255,255,255,0.12); color: var(--text); }
+        .theme-panel { position: absolute; top: calc(100% + 0.5rem); right: 0; background: rgba(8,8,8,0.96); border: 1px solid rgba(255,255,255,0.18); border-radius: 12px; padding: 0.5rem; display: none; flex-direction: column; gap: 0.25rem; backdrop-filter: blur(16px); min-width: 108px; }
+        .theme-panel.open { display: flex; }
+        .theme-swatch { display: flex; align-items: center; gap: 0.6rem; padding: 0.3rem 0.55rem; border-radius: 7px; cursor: pointer; font-size: 0.72rem; color: var(--text-dim); letter-spacing: 0.12em; text-transform: uppercase; font-family: 'Share Tech Mono', monospace; transition: all 0.15s; border: 1px solid transparent; }
+        .theme-swatch:hover { background: rgba(255,255,255,0.07); color: var(--text); }
+        .theme-swatch.active { border-color: rgba(255,255,255,0.28); color: var(--accent); background: rgba(255,255,255,0.05); }
+        .theme-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.15); }
+
+        /* ── Background themes ── */
+        body[data-theme="dark"]   { background-image: none; }
+        body[data-theme="ocean"]  { background-image: linear-gradient(135deg,#0a1628,#0d3166,#0a1628); }
+        body[data-theme="forest"] { background-image: linear-gradient(135deg,#0a1a0a,#0d2b18,#091508); }
+        body[data-theme="ember"]  { background-image: linear-gradient(135deg,#1a0500,#3d0d00,#1a0500); }
+        body[data-theme="void"]   { background-image: linear-gradient(135deg,#0d001a,#1a0033,#001a1a); }
+        body[data-theme="dark"]::before   { background: rgba(0,0,0,0.02); }
+        body[data-theme="ocean"]::before  { background: rgba(0,0,8,0.45); }
+        body[data-theme="forest"]::before { background: rgba(0,8,2,0.40); }
+        body[data-theme="ember"]::before  { background: rgba(8,2,0,0.25); }
+        body[data-theme="void"]::before   { background: rgba(3,0,8,0.35); }
+
         /* ── Responsive ── */
         /* 中間幅: サイドバーを縮小、ギャップを詰める */
         @media (max-width: 1200px) {
@@ -644,6 +667,19 @@
 </head>
 <body>
     <div class="alert-overlay" id="alertOverlay"></div>
+
+    <!-- Theme toggle -->
+    <div class="theme-toggle">
+        <button class="theme-toggle-btn" onclick="toggleThemePanel()">🎨</button>
+        <div class="theme-panel" id="themePanel">
+            <div class="theme-swatch" data-theme="ice"    onclick="setTheme('ice')"><span class="theme-dot" style="background:linear-gradient(135deg,#bbb,#555)"></span>ICE</div>
+            <div class="theme-swatch" data-theme="dark"   onclick="setTheme('dark')"><span class="theme-dot" style="background:#1a1a1a;border-color:rgba(255,255,255,0.25)"></span>DARK</div>
+            <div class="theme-swatch" data-theme="ocean"  onclick="setTheme('ocean')"><span class="theme-dot" style="background:linear-gradient(135deg,#0d3166,#1a6b8a)"></span>OCEAN</div>
+            <div class="theme-swatch" data-theme="forest" onclick="setTheme('forest')"><span class="theme-dot" style="background:linear-gradient(135deg,#0d2b18,#1a4a2a)"></span>FOREST</div>
+            <div class="theme-swatch" data-theme="ember"  onclick="setTheme('ember')"><span class="theme-dot" style="background:linear-gradient(135deg,#3d0d00,#8b2500)"></span>EMBER</div>
+            <div class="theme-swatch" data-theme="void"   onclick="setTheme('void')"><span class="theme-dot" style="background:linear-gradient(135deg,#1a0033,#001a2a)"></span>VOID</div>
+        </div>
+    </div>
 
     <!-- Language toggle -->
     <div class="lang-toggle">
@@ -2016,6 +2052,23 @@
         setInterval(updateClock, 1000);
         function clockAnimLoop() { drawClock(); requestAnimationFrame(clockAnimLoop); }
         clockAnimLoop();
+
+        // ── Theme ──────────────────────────────────────────────────────
+        function setTheme(name) {
+            document.body.setAttribute('data-theme', name);
+            localStorage.setItem('timehack-theme', name);
+            document.querySelectorAll('.theme-swatch').forEach(el =>
+                el.classList.toggle('active', el.dataset.theme === name));
+            document.getElementById('themePanel').classList.remove('open');
+        }
+        function toggleThemePanel() {
+            document.getElementById('themePanel').classList.toggle('open');
+        }
+        document.addEventListener('click', e => {
+            if (!e.target.closest('.theme-toggle'))
+                document.getElementById('themePanel').classList.remove('open');
+        });
+        setTheme(localStorage.getItem('timehack-theme') || 'ice');
     </script>
 </body>
 </html>
