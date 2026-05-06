@@ -643,6 +643,8 @@
         body[data-theme="forest"]::before { background: rgba(0,8,2,0.40); }
         body[data-theme="ember"]::before  { background: rgba(8,2,0,0.25); }
         body[data-theme="void"]::before   { background: rgba(3,0,8,0.35); }
+        body[data-theme="white"]  { background-image: none; background-color: #e8e8e8; }
+        body[data-theme="white"]::before  { background: rgba(255,255,255,0.25); }
 
         /* ── Responsive ── */
         /* 中間幅: サイドバーを縮小、ギャップを詰める */
@@ -678,6 +680,7 @@
             <div class="theme-swatch" data-theme="forest" onclick="setTheme('forest')"><span class="theme-dot" style="background:linear-gradient(135deg,#0d2b18,#1a4a2a)"></span>FOREST</div>
             <div class="theme-swatch" data-theme="ember"  onclick="setTheme('ember')"><span class="theme-dot" style="background:linear-gradient(135deg,#3d0d00,#8b2500)"></span>EMBER</div>
             <div class="theme-swatch" data-theme="void"   onclick="setTheme('void')"><span class="theme-dot" style="background:linear-gradient(135deg,#1a0033,#001a2a)"></span>VOID</div>
+            <div class="theme-swatch" data-theme="white"  onclick="setTheme('white')"><span class="theme-dot" style="background:#e8e8e8;border-color:rgba(0,0,0,0.2)"></span>WHITE</div>
         </div>
     </div>
 
