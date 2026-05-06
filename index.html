@@ -3,7 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TIME HACK — Interval Alert System</title>
+    <title>TIME HACK — タイマー・アラーム・世界時計・インターバルタイマー</title>
+    <meta name="description" content="TIME HACK はタイマー・インターバルタイマー・アラーム・ストップウォッチ・世界時計をひとつにまとめた無料Webアプリです。トレーニング・作業・瞑想・ポモドーロなどに最適。">
+    <meta name="keywords" content="タイムハック,time hack,タイマー,インターバルタイマー,アラーム,ストップウォッチ,世界時計,時計,カウントダウン,ポモドーロ,インターバル,オンラインタイマー,無料タイマー,トレーニングタイマー">
+    <meta name="author" content="TIME HACK">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://CrystalBabyBoyG.github.io/Timehack/">
+
+    <!-- OGP（SNSシェア用） -->
+    <meta property="og:title" content="TIME HACK — タイマー・アラーム・世界時計">
+    <meta property="og:description" content="タイマー・インターバルタイマー・アラーム・ストップウォッチ・世界時計を1ページで使える無料Webアプリ">
+    <meta property="og:url" content="https://CrystalBabyBoyG.github.io/Timehack/">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="ja_JP">
+
+    <!-- 構造化データ（Google検索向け） -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "TIME HACK",
+      "url": "https://CrystalBabyBoyG.github.io/Timehack/",
+      "description": "タイマー・インターバルタイマー・アラーム・ストップウォッチ・世界時計を1ページで使える無料Webアプリ",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Web",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" },
+      "keywords": "タイマー, インターバルタイマー, アラーム, ストップウォッチ, 世界時計, カウントダウン"
+    }
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -413,6 +441,34 @@
         .alarm-notif-btn:hover { background: rgba(255,23,68,0.22); }
         .alarm-notif-btn.snooze { border-color: rgba(255,170,0,0.5); color: #ffaa00; background: rgba(255,170,0,0.08); }
         .alarm-notif-btn.snooze:hover { background: rgba(255,170,0,0.15); }
+        /* ── Alarm list items ── */
+        #alarmList { display: flex; flex-direction: column; gap: 0.7rem; margin-top: 1rem; }
+        .alarm-item { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 0.9rem 1.1rem; display: flex; align-items: center; gap: 1rem; }
+        .alarm-item.firing { border-color: var(--danger); box-shadow: 0 0 14px rgba(255,23,68,0.3); animation: alarmFlash 0.5s ease infinite; }
+        .alarm-item-time { font-family: 'Share Tech Mono', monospace; font-size: 1.6rem; color: #fff; min-width: 5ch; }
+        .alarm-item.firing .alarm-item-time { color: var(--danger); text-shadow: var(--glow-red); }
+        .alarm-item-info { flex: 1; display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
+        .alarm-item-label { font-size: 0.85rem; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .alarm-item-countdown { font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; color: var(--text-dim); }
+        .alarm-item.firing .alarm-item-countdown { color: var(--danger); }
+        .alarm-item-sound { font-size: 1.1rem; }
+        .alarm-item-btns { display: flex; gap: 0.4rem; flex-shrink: 0; }
+        .alarm-item-btn { padding: 0.28rem 0.7rem; font-size: 0.78rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); color: #fff; cursor: pointer; font-family: 'Rajdhani', sans-serif; letter-spacing: 0.06em; }
+        .alarm-item-btn:hover { background: rgba(255,255,255,0.14); }
+        .alarm-item-btn.danger { border-color: rgba(255,23,68,0.4); color: #ff5a5a; }
+        .alarm-item-btn.danger:hover { background: rgba(255,23,68,0.15); }
+        .alarm-item-btn.snooze { border-color: rgba(255,170,0,0.4); color: #ffaa00; }
+        .alarm-item-btn.snooze:hover { background: rgba(255,170,0,0.12); }
+        .alarm-msg-input {
+            width: 100%; background: var(--surface2);
+            border: 1px solid rgba(255,255,255,0.18); border-radius: 8px;
+            color: var(--text); font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95rem; padding: 0.45rem 0.75rem; outline: none;
+            margin-bottom: 0.5rem; letter-spacing: 0.05em;
+        }
+        .alarm-msg-input::placeholder { color: var(--text-dim); }
+        .alarm-msg-input:focus { border-color: rgba(255,255,255,0.38); }
+        .notif-perm-hint { font-size: 0.62rem; color: var(--text-dim); letter-spacing: 0.08em; margin-bottom: 0.7rem; min-height: 1em; }
 
         /* ── Stopwatch panel ── */
         .sw-display {
@@ -494,8 +550,39 @@
         .clock-digital-date { font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--text-dim); letter-spacing: 0.2em; margin-top: 0.4rem; }
         .clock-year { font-family: 'Share Tech Mono', monospace; font-size: clamp(1.2rem,3vw,1.7rem); color: var(--accent); text-shadow: var(--glow); letter-spacing: 0.2em; text-align: center; margin-top: 0.4rem; }
         .clock-date-dow { display: flex; align-items: center; justify-content: center; gap: 0.6rem; margin-top: 0.25rem; font-family: 'Share Tech Mono', monospace; font-size: clamp(0.8rem,2vw,1rem); color: var(--text-dim); letter-spacing: 0.18em; }
+        .clock-tz-select {
+            background: rgba(0,0,0,0.55);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 6px;
+            color: var(--text-dim);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.05em;
+            padding: 0.25rem 0.5rem;
+            cursor: pointer;
+            outline: none;
+            margin-top: 0.35rem;
+            width: 100%;
+            max-width: 220px;
+        }
+        .clock-tz-select:hover { border-color: rgba(255,255,255,0.35); color: var(--text); }
+        .clock-tz-select option { background: #111; color: #eee; }
         .clock-dow { color: rgba(255,255,255,0.6); }
         .clock-dot { opacity: 0.35; }
+        /* ── World clock ── */
+        .world-add-row { display: flex; gap: 0.6rem; margin-bottom: 1.2rem; }
+        .world-tz-select { flex: 1; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.18); border-radius: 8px; color: var(--text); font-family: 'Rajdhani', sans-serif; font-size: 0.95rem; padding: 0.45rem 0.7rem; cursor: pointer; appearance: none; }
+        .world-tz-select:focus { outline: none; border-color: rgba(255,255,255,0.4); }
+        .world-tz-select option { background: #111; color: #eee; }
+        .world-city-list { display: flex; flex-direction: column; gap: 0.65rem; }
+        .world-city-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.11); border-radius: 10px; padding: 0.85rem 1rem; display: flex; align-items: center; gap: 0.9rem; }
+        .world-city-card.is-local { border-color: rgba(255,255,255,0.3); }
+        .world-city-left { flex: 1; min-width: 0; }
+        .world-city-name { font-family: 'Rajdhani', sans-serif; font-size: 1.05rem; font-weight: 700; color: var(--text); letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .world-city-time { font-family: 'Share Tech Mono', monospace; font-size: 1.55rem; color: var(--accent); text-shadow: var(--glow); letter-spacing: 0.05em; }
+        .world-city-date { font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--text-dim); margin-top: 0.1rem; }
+        .world-city-remove { background: none; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: var(--text-dim); cursor: pointer; padding: 0.2rem 0.5rem; font-size: 0.8rem; flex-shrink: 0; }
+        .world-city-remove:hover { border-color: rgba(255,23,68,0.5); color: #ff5a5a; background: rgba(255,23,68,0.08); }
 
         /* ── Sequence ── */
         .seq-add-row { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.4rem; justify-content: center; }
@@ -525,8 +612,22 @@
         .seq-loop-btn:disabled { opacity: 0.2; cursor: not-allowed; }
 
         .footer { margin-top: 1.5rem; font-size: 0.7rem; letter-spacing: 0.15em; color: rgba(136,136,136,0.5); text-transform: uppercase; }
+        /* ── Language toggle ── */
+        .lang-toggle { position: fixed; top: 1rem; right: 1.2rem; z-index: 200; display: flex; gap: 0; border: 1px solid rgba(255,255,255,0.18); border-radius: 8px; overflow: hidden; }
+        .lang-btn { background: rgba(255,255,255,0.05); border: none; color: var(--text-dim); font-family: 'Rajdhani', sans-serif; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.1em; padding: 0.3rem 0.7rem; cursor: pointer; transition: all 0.15s; }
+        .lang-btn:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+        .lang-btn.active { background: rgba(255,255,255,0.15); color: var(--accent); }
+        .lang-divider { width: 1px; background: rgba(255,255,255,0.18); flex-shrink: 0; }
 
         /* ── Responsive ── */
+        /* 中間幅: サイドバーを縮小、ギャップを詰める */
+        @media (max-width: 1200px) {
+            .page-layout { gap: 1.2rem; }
+            .card { padding: 0.9rem 1.1rem; }
+            .sidebar { gap: 0.3rem; }
+            .nav-item { padding: 0.7rem 0.6rem; min-width: 60px; }
+            #analogClock { width: min(260px, 22vw); }
+        }
         @media (max-width: 960px) {
             .page-layout { grid-template-columns: 1fr; }
             .grid-left { justify-content: center; }
@@ -542,12 +643,19 @@
 <body>
     <div class="alert-overlay" id="alertOverlay"></div>
 
+    <!-- Language toggle -->
+    <div class="lang-toggle">
+        <button class="lang-btn active" id="langBtnEn" onclick="setLang('en')">EN</button>
+        <div class="lang-divider"></div>
+        <button class="lang-btn" id="langBtnJa" onclick="setLang('ja')">JA</button>
+    </div>
+
     <!-- Floating alarm notification -->
     <div class="alarm-notif" id="alarmNotif">
-        <span class="alarm-notif-label">⏰ ALARM</span>
+        <span class="alarm-notif-label" data-i18n="alarm_label">⏰ ALARM</span>
         <span class="alarm-notif-time" id="alarmNotifTime">00:00</span>
-        <button class="alarm-notif-btn snooze" onclick="snoozeAlarm()">Snooze 5m</button>
-        <button class="alarm-notif-btn" onclick="dismissAlarm()">Dismiss</button>
+        <button class="alarm-notif-btn snooze" onclick="snoozeCurrentAlarm()" data-i18n="btn_snooze">Snooze 5m</button>
+        <button class="alarm-notif-btn" onclick="dismissCurrentAlarm()" data-i18n="btn_dismiss">Dismiss</button>
     </div>
 
     <div class="page-layout">
@@ -555,15 +663,19 @@
             <nav class="sidebar">
                 <div class="nav-item active" id="nav-timer" onclick="switchTab('timer')">
                     <span class="nav-icon">⏱</span>
-                    <span class="nav-label">Timer</span>
+                    <span class="nav-label" data-i18n="nav_timer">Timer</span>
                 </div>
                 <div class="nav-item" id="nav-alarm" onclick="switchTab('alarm')">
                     <span class="nav-icon">⏰</span>
-                    <span class="nav-label">Alarm</span>
+                    <span class="nav-label" data-i18n="nav_alarm">Alarm</span>
                 </div>
                 <div class="nav-item" id="nav-sw" onclick="switchTab('sw')">
                     <span class="nav-icon">⏲</span>
-                    <span class="nav-label">Watch</span>
+                    <span class="nav-label" data-i18n="nav_sw">Watch</span>
+                </div>
+                <div class="nav-item" id="nav-world" onclick="switchTab('world')">
+                    <span class="nav-icon">🌍</span>
+                    <span class="nav-label" data-i18n="nav_world">World</span>
                 </div>
             </nav>
         </div>
@@ -575,7 +687,7 @@
             <div class="card">
                 <!-- ══ Timer panel ══ -->
                 <div id="panel-timer">
-                    <div class="section-label">Interval</div>
+                    <div class="section-label" data-i18n="lbl_interval">Interval</div>
                     <div class="interval-setter">
                         <div class="time-unit">
                             <div class="time-input-wrap">
@@ -583,7 +695,7 @@
                                 <input type="number" class="time-input" id="hours" value="0" min="0" max="23" inputmode="numeric">
                                 <button class="spin-btn down" id="hDown" onclick="spin('hours',-1)">▼</button>
                             </div>
-                            <label>Hours</label>
+                            <label data-i18n="unit_hours">Hours</label>
                         </div>
                         <div class="colon">:</div>
                         <div class="time-unit">
@@ -592,7 +704,7 @@
                                 <input type="number" class="time-input" id="minutes" value="5" min="0" max="59" inputmode="numeric">
                                 <button class="spin-btn down" id="mDown" onclick="spin('minutes',-1)">▼</button>
                             </div>
-                            <label>Min</label>
+                            <label data-i18n="unit_min">Min</label>
                         </div>
                         <div class="colon">:</div>
                         <div class="time-unit">
@@ -601,7 +713,7 @@
                                 <input type="number" class="time-input" id="seconds" value="0" min="0" max="59" inputmode="numeric">
                                 <button class="spin-btn down" id="sDown" onclick="spin('seconds',-1)">▼</button>
                             </div>
-                            <label>Sec</label>
+                            <label data-i18n="unit_sec">Sec</label>
                         </div>
                     </div>
                     <div class="preset-row" id="presetRow">
@@ -611,7 +723,7 @@
                         <button class="preset-btn" onclick="setPreset(0,25,0)">25m</button>
                         <button class="preset-btn" onclick="setPreset(1,0,0)">1h</button>
                     </div>
-                    <div class="section-label">Sequence</div>
+                    <div class="section-label" data-i18n="lbl_sequence">Sequence</div>
                     <div class="seq-add-row">
                         <div class="seq-reps-group">
                             <span class="seq-x-symbol">×</span>
@@ -620,40 +732,40 @@
                                 <input type="number" class="time-input seq-reps-input" id="repsInput" value="1" min="1" max="99" inputmode="numeric">
                                 <button class="spin-btn down" id="repsDown" onclick="spinReps(-1)">▼</button>
                             </div>
-                            <span class="reps-suffix">Reps</span>
+                            <span class="reps-suffix" data-i18n="unit_reps">Reps</span>
                         </div>
-                        <button class="btn btn-neutral seq-add-btn" id="seqAddBtn" onclick="addSeqStep()">+ Add Step</button>
+                        <button class="btn btn-neutral seq-add-btn" id="seqAddBtn" onclick="addSeqStep()" data-i18n="btn_add_step">+ Add Step</button>
                     </div>
                     <div id="seqList" class="seq-list">
-                        <div class="seq-empty">ステップを追加（空のままで無限ループ）</div>
+                        <div class="seq-empty" data-i18n="seq_empty">ステップを追加（空のままで無限ループ）</div>
                     </div>
-                    <button class="seq-loop-btn" id="seqLoopBtn" onclick="toggleSeqLoop()">↻ Loop Sequence</button>
-                    <div class="section-label">Sound</div>
+                    <button class="seq-loop-btn" id="seqLoopBtn" onclick="toggleSeqLoop()" data-i18n="btn_loop_seq">↻ Loop Sequence</button>
+                    <div class="section-label" data-i18n="lbl_sound">Sound</div>
                     <div class="sound-grid">
                         <div class="sound-card selected" id="sound-trader" onclick="selectSound('trader',this)">
                             <div class="sound-icon">📈</div>
                             <div class="sound-name">Trader</div>
                             <button class="preview-btn" id="prev-trader" onclick="previewSound(event,'trader')">▶ Play</button>
                         </div>
-                        <div class="sound-card" id="sound-gun" onclick="selectSound('gun',this)">
-                            <div class="sound-icon">🔫</div>
-                            <div class="sound-name">Gun</div>
-                            <button class="preview-btn" id="prev-gun" onclick="previewSound(event,'gun')">▶ Play</button>
+                        <div class="sound-card" id="sound-gym" onclick="selectSound('gym',this)">
+                            <div class="sound-icon">📯</div>
+                            <div class="sound-name">Buzzer</div>
+                            <button class="preview-btn" id="prev-gym" onclick="previewSound(event,'gym')">▶ Play</button>
                         </div>
-                        <div class="sound-card" id="sound-cyber" onclick="selectSound('cyber',this)">
-                            <div class="sound-icon">🤖</div>
-                            <div class="sound-name">Cyber</div>
-                            <button class="preview-btn" id="prev-cyber" onclick="previewSound(event,'cyber')">▶ Play</button>
+                        <div class="sound-card" id="sound-car" onclick="selectSound('car',this)">
+                            <div class="sound-icon">🚨</div>
+                            <div class="sound-name">Siren</div>
+                            <button class="preview-btn" id="prev-car" onclick="previewSound(event,'car')">▶ Play</button>
                         </div>
-                        <div class="sound-card" id="sound-sparring" onclick="selectSound('sparring',this)">
+                        <div class="sound-card" id="sound-boxing" onclick="selectSound('boxing',this)">
                             <div class="sound-icon">🥊</div>
-                            <div class="sound-name">Sparring</div>
-                            <button class="preview-btn" id="prev-sparring" onclick="previewSound(event,'sparring')">▶ Play</button>
+                            <div class="sound-name">Boxing</div>
+                            <button class="preview-btn" id="prev-boxing" onclick="previewSound(event,'boxing')">▶ Play</button>
                         </div>
-                        <div class="sound-card" id="sound-hiphop" onclick="selectSound('hiphop',this)">
-                            <div class="sound-icon">🎤</div>
-                            <div class="sound-name">Hip-hop</div>
-                            <button class="preview-btn" id="prev-hiphop" onclick="previewSound(event,'hiphop')">▶ Play</button>
+                        <div class="sound-card" id="sound-space" onclick="selectSound('space',this)">
+                            <div class="sound-icon">🚀</div>
+                            <div class="sound-name">Space</div>
+                            <button class="preview-btn" id="prev-space" onclick="previewSound(event,'space')">▶ Play</button>
                         </div>
                     </div>
                     <div class="volume-row">
@@ -661,22 +773,22 @@
                         <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="70" oninput="updateVolume(this.value)">
                         <span class="volume-label" id="volumeLabel">70%</span>
                     </div>
-                    <input type="file" id="audioUpload" accept="audio/*" style="display:none">
+                    <input type="file" id="audioUpload" accept="audio/*,video/mp4,video/quicktime,video/webm,.mp4,.mov,.m4v,.3gp" style="display:none">
                     <div class="upload-zone" id="uploadZone">
                         <div class="upload-icon" id="uploadIcon">📁</div>
                         <div class="upload-info">
-                            <div class="upload-title" id="uploadTitle">カスタム音声を追加</div>
+                            <div class="upload-title" id="uploadTitle" data-i18n="upload_title">カスタム音声を追加</div>
                             <div class="upload-filename" id="uploadFilename" style="display:none"></div>
-                            <div class="upload-hint" id="uploadHint">クリックまたはファイルをドロップ（MP3 / WAV / OGG）</div>
+                            <div class="upload-hint" id="uploadHint" data-i18n="upload_hint">クリックまたはドロップ（音声・動画ファイル対応）</div>
                         </div>
                         <button class="upload-preview-btn" id="uploadPreviewBtn" style="display:none" onclick="previewCustomSound(event)">▶ Play</button>
                     </div>
-                    <div class="section-label">Next Alert</div>
+                    <div class="section-label" data-i18n="lbl_next_alert">Next Alert</div>
                     <div class="countdown-section">
                         <div class="countdown" id="countdown">--:--:--</div>
                         <div class="status-row">
                             <div class="status-dot" id="statusDot"></div>
-                            <span id="statusText">Standby</span>
+                            <span id="statusText" data-i18n="status_standby">Standby</span>
                         </div>
                         <div class="seq-status" id="seqStatus" style="display:none"></div>
                     </div>
@@ -686,27 +798,27 @@
                     <div class="sound-notice" id="soundNotice"></div>
                     <div class="controls">
                         <button class="btn btn-start" id="startBtn" onclick="handleStartBtn()">▶ Start</button>
-                        <button class="btn btn-stop" id="stopBtn" onclick="stopTimer()" disabled>■ Stop</button>
+                        <button class="btn btn-stop" id="stopBtn" onclick="stopTimer()" disabled data-i18n="btn_stop">■ Stop</button>
                     </div>
                     <div class="stats">
                         <div class="stat">
                             <div class="stat-value" id="alertCount">0</div>
-                            <div class="stat-label">Alerts</div>
+                            <div class="stat-label" data-i18n="lbl_alerts">Alerts</div>
                         </div>
                         <div class="stat">
                             <div class="stat-value" id="elapsedTime">00:00</div>
-                            <div class="stat-label">Elapsed</div>
+                            <div class="stat-label" data-i18n="lbl_elapsed">Elapsed</div>
                         </div>
                     </div>
                     <div class="kb-hints">
-                        <div class="kb-hint"><span class="kb-key">Space</span> Start / Pause</div>
-                        <div class="kb-hint"><span class="kb-key">Esc</span> Stop</div>
+                        <div class="kb-hint"><span class="kb-key">Space</span> <span data-i18n="kb_space_timer">Start / Pause</span></div>
+                        <div class="kb-hint"><span class="kb-key">Esc</span> <span data-i18n="kb_esc_timer">Stop</span></div>
                     </div>
                 </div><!-- /panel-timer -->
 
                 <!-- ══ Alarm panel ══ -->
                 <div id="panel-alarm" style="display:none">
-                    <div class="section-label">Alarm Time</div>
+                    <div class="section-label" data-i18n="lbl_alarm_time">Alarm Time</div>
                     <div class="alarm-setter">
                         <div class="time-unit">
                             <div class="time-input-wrap">
@@ -714,7 +826,7 @@
                                 <input type="number" class="time-input" id="alarmH" value="7" min="0" max="23" inputmode="numeric">
                                 <button class="spin-btn down" onclick="spinInput('alarmH',-1,23)">▼</button>
                             </div>
-                            <label>Hour</label>
+                            <label data-i18n="unit_hour">Hour</label>
                         </div>
                         <div class="colon">:</div>
                         <div class="time-unit">
@@ -723,31 +835,36 @@
                                 <input type="number" class="time-input" id="alarmM" value="0" min="0" max="59" inputmode="numeric">
                                 <button class="spin-btn down" onclick="spinInput('alarmM',-1,59)">▼</button>
                             </div>
-                            <label>Min</label>
+                            <label data-i18n="unit_min">Min</label>
                         </div>
                     </div>
+                    <div class="section-label" data-i18n="lbl_sound">Sound</div>
+                    <div class="sound-grid" id="alarmSoundGrid">
+                        <div class="sound-card selected" id="asound-trader" onclick="selectAlarmSound('trader',this)"><div class="sound-icon">📈</div><div class="sound-name">Trader</div></div>
+                        <div class="sound-card" id="asound-gym" onclick="selectAlarmSound('gym',this)"><div class="sound-icon">📯</div><div class="sound-name">Buzzer</div></div>
+                        <div class="sound-card" id="asound-car" onclick="selectAlarmSound('car',this)"><div class="sound-icon">🚨</div><div class="sound-name">Siren</div></div>
+                        <div class="sound-card" id="asound-boxing" onclick="selectAlarmSound('boxing',this)"><div class="sound-icon">🥊</div><div class="sound-name">Boxing</div></div>
+                        <div class="sound-card" id="asound-space" onclick="selectAlarmSound('space',this)"><div class="sound-icon">🚀</div><div class="sound-name">Space</div></div>
+                    </div>
+                    <input type="file" id="alarmAudioUpload" accept="audio/*,video/mp4,video/quicktime,video/webm,.mp4,.mov,.m4v,.3gp" style="display:none">
+                    <div class="upload-zone" id="alarmUploadZone">
+                        <div class="upload-icon" id="alarmUploadIcon">📁</div>
+                        <div class="upload-info">
+                            <div class="upload-title" id="alarmUploadTitle" data-i18n="upload_title">カスタム音声を追加</div>
+                            <div class="upload-filename" id="alarmUploadFilename" style="display:none"></div>
+                            <div class="upload-hint" id="alarmUploadHint" data-i18n="upload_hint">クリックまたはドロップ（音声・動画ファイル対応）</div>
+                        </div>
+                        <button class="upload-preview-btn" id="alarmUploadPreviewBtn" style="display:none" onclick="event.stopPropagation();resumeAndPlay(()=>playAlarmCustom());">▶ Play</button>
+                    </div>
+                    <div class="section-label" data-i18n="lbl_notif_msg">Notification Message</div>
+                    <input type="text" class="alarm-msg-input" id="alarmMsg" placeholder="⏰ Wake up!" maxlength="80" value="⏰ Wake up!" data-i18n-ph="ph_alarm_msg">
+                    <div class="notif-perm-hint" id="notifPermHint"></div>
                     <div class="alarm-controls">
-                        <button class="btn btn-start" id="alarmSetBtn" onclick="setAlarm()">⏰ Set Alarm</button>
+                        <button class="btn btn-start" onclick="setAlarm()" data-i18n="btn_add_alarm">⏰ Add Alarm</button>
                     </div>
-
-                    <!-- Status (shown when alarm is set) -->
-                    <div id="alarmStatus" style="display:none">
-                        <div class="section-label">Status</div>
-                        <div class="alarm-display">
-                            <div class="alarm-big" id="alarmBigTime">07:00</div>
-                            <div class="alarm-countdown-text" id="alarmCountdownText">--</div>
-                            <div class="status-row" style="margin-top:0.8rem">
-                                <div class="status-dot alarm-on" id="alarmDot"></div>
-                                <span id="alarmStatusTxt">Alarm Set</span>
-                            </div>
-                        </div>
-                        <div class="alarm-controls" id="alarmActionBtns">
-                            <button class="btn btn-neutral" id="alarmSnoozeBtn" style="display:none" onclick="snoozeAlarm()">Snooze 5m</button>
-                            <button class="btn btn-stop" onclick="cancelAlarm()">■ Cancel</button>
-                        </div>
-                    </div>
+                    <div id="alarmList"></div>
                     <div class="kb-hints">
-                        <div class="kb-hint"><span class="kb-key">Esc</span> Cancel alarm</div>
+                        <div class="kb-hint"><span class="kb-key">Esc</span> <span data-i18n="kb_esc_alarm">Cancel latest alarm</span></div>
                     </div>
                 </div><!-- /panel-alarm -->
 
@@ -758,23 +875,33 @@
                     </div>
                     <div class="status-row" style="margin-bottom:1.2rem">
                         <div class="status-dot" id="swDot"></div>
-                        <span id="swStatus">Ready</span>
+                        <span id="swStatus" data-i18n="status_ready">Ready</span>
                     </div>
                     <div class="controls">
                         <button class="btn btn-start" id="swStartBtn" onclick="swHandleStart()">▶ Start</button>
-                        <button class="btn btn-stop" id="swResetBtn" onclick="swReset()" disabled>↺ Reset</button>
+                        <button class="btn btn-stop" id="swResetBtn" onclick="swReset()" disabled data-i18n="btn_reset">↺ Reset</button>
                     </div>
-                    <button class="sw-lap-btn" id="swLapBtn" onclick="swLap()" disabled>◉ Lap</button>
-                    <div class="section-label">Laps</div>
+                    <button class="sw-lap-btn" id="swLapBtn" onclick="swLap()" disabled data-i18n="btn_lap">◉ Lap</button>
+                    <div class="section-label" data-i18n="lbl_laps">Laps</div>
                     <div id="swLapList">
-                        <div class="sw-empty" id="swEmpty">No laps recorded</div>
+                        <div class="sw-empty" id="swEmpty" data-i18n="sw_no_laps">No laps recorded</div>
                     </div>
                     <div class="kb-hints" style="margin-top:1rem">
-                        <div class="kb-hint"><span class="kb-key">Space</span> Start / Pause</div>
-                        <div class="kb-hint"><span class="kb-key">L</span> Lap</div>
-                        <div class="kb-hint"><span class="kb-key">Esc</span> Reset</div>
+                        <div class="kb-hint"><span class="kb-key">Space</span> <span data-i18n="kb_space_sw">Start / Pause</span></div>
+                        <div class="kb-hint"><span class="kb-key">L</span> <span data-i18n="kb_l_sw">Lap</span></div>
+                        <div class="kb-hint"><span class="kb-key">Esc</span> <span data-i18n="kb_esc_sw">Reset</span></div>
                     </div>
                 </div><!-- /panel-sw -->
+
+                <!-- ══ World clock panel ══ -->
+                <div id="panel-world" style="display:none">
+                    <div class="section-label" data-i18n="lbl_world_clock">World Clock</div>
+                    <div class="world-add-row">
+                        <select class="world-tz-select" id="worldTzSelect"></select>
+                        <button class="btn btn-start" style="white-space:nowrap" onclick="addWorldClock()" data-i18n="btn_add_world">＋ Add</button>
+                    </div>
+                    <div class="world-city-list" id="worldCityList"></div>
+                </div><!-- /panel-world -->
 
             </div><!-- /card -->
             <div class="footer">timehack.com</div>
@@ -791,27 +918,107 @@
                     <span class="clock-dot">·</span>
                     <span class="clock-dow" id="clockDOW">---</span>
                 </div>
+                <select class="clock-tz-select" id="clockTzSelect" onchange="setClockTz(this.value)"></select>
             </div>
         </div>
     </div>
 
     <script>
+        // ── i18n ─────────────────────────────────────────────────────
+        const LANGS = {
+            en: {
+                nav_timer:'Timer', nav_alarm:'Alarm', nav_sw:'Watch', nav_world:'World',
+                lbl_interval:'Interval', lbl_sequence:'Sequence', lbl_sound:'Sound',
+                lbl_next_alert:'Next Alert', lbl_alarm_time:'Alarm Time',
+                lbl_notif_msg:'Notification Message', lbl_world_clock:'World Clock', lbl_laps:'Laps',
+                lbl_alerts:'Alerts', lbl_elapsed:'Elapsed',
+                unit_hours:'Hours', unit_min:'Min', unit_sec:'Sec', unit_hour:'Hour', unit_reps:'Reps',
+                btn_add_step:'+ Add Step', btn_loop_seq:'↻ Loop Sequence',
+                btn_stop:'■ Stop', btn_add_alarm:'⏰ Add Alarm', btn_add_world:'＋ Add',
+                btn_reset:'↺ Reset', btn_lap:'◉ Lap',
+                btn_start:'▶ Start', btn_pause:'⏸ Pause', btn_resume:'▶ Resume',
+                btn_snooze:'Snooze 5m', btn_dismiss:'Dismiss',
+                kb_space_timer:'Start / Pause', kb_esc_timer:'Stop',
+                kb_esc_alarm:'Cancel latest alarm',
+                kb_space_sw:'Start / Pause', kb_l_sw:'Lap', kb_esc_sw:'Reset',
+                upload_title:'Custom Sound', upload_hint:'Click or drop (audio / video)',
+                ph_alarm_msg:'⏰ Wake up!',
+                status_standby:'Standby', status_ready:'Ready', status_running:'Running', status_paused:'Paused',
+                sw_no_laps:'No laps recorded',
+                seq_empty:'Add step  (leave empty for infinite loop)',
+                alarm_label:'⏰ ALARM', alarm_snoozed:'Snoozed (+5m)',
+            },
+            ja: {
+                nav_timer:'タイマー', nav_alarm:'アラーム', nav_sw:'ストップウォッチ', nav_world:'世界時計',
+                lbl_interval:'インターバル', lbl_sequence:'シーケンス', lbl_sound:'サウンド',
+                lbl_next_alert:'次のアラート', lbl_alarm_time:'アラーム時刻',
+                lbl_notif_msg:'通知メッセージ', lbl_world_clock:'世界時計', lbl_laps:'ラップ',
+                lbl_alerts:'アラート数', lbl_elapsed:'経過時間',
+                unit_hours:'時間', unit_min:'分', unit_sec:'秒', unit_hour:'時', unit_reps:'回',
+                btn_add_step:'＋ ステップ追加', btn_loop_seq:'↻ ループ',
+                btn_stop:'■ ストップ', btn_add_alarm:'⏰ アラーム追加', btn_add_world:'＋ 追加',
+                btn_reset:'↺ リセット', btn_lap:'◉ ラップ',
+                btn_start:'▶ スタート', btn_pause:'⏸ 一時停止', btn_resume:'▶ 再開',
+                btn_snooze:'スヌーズ 5分', btn_dismiss:'閉じる',
+                kb_space_timer:'スタート / 一時停止', kb_esc_timer:'ストップ',
+                kb_esc_alarm:'最新アラームをキャンセル',
+                kb_space_sw:'スタート / 一時停止', kb_l_sw:'ラップ', kb_esc_sw:'リセット',
+                upload_title:'カスタム音声を追加', upload_hint:'クリックまたはドロップ（音声・動画ファイル対応）',
+                ph_alarm_msg:'⏰ 起きて！',
+                status_standby:'待機中', status_ready:'待機中', status_running:'動作中', status_paused:'一時停止',
+                sw_no_laps:'ラップなし',
+                seq_empty:'ステップを追加（空のままで無限ループ）',
+                alarm_label:'⏰ アラーム', alarm_snoozed:'スヌーズ中 (+5分)',
+            }
+        };
+        const _bl = (navigator.languages && navigator.languages[0]) || navigator.language || 'en';
+        let currentLang = _bl.toLowerCase().startsWith('ja') ? 'ja' : 'en';
+        function t(key) { return (LANGS[currentLang] || LANGS.en)[key] || LANGS.en[key] || key; }
+        function applyLang() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (el.tagName === 'INPUT') el.value = t(key);
+                else el.textContent = t(key);
+            });
+            document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+                el.placeholder = t(el.getAttribute('data-i18n-ph'));
+            });
+            document.getElementById('langBtnEn').classList.toggle('active', currentLang === 'en');
+            document.getElementById('langBtnJa').classList.toggle('active', currentLang === 'ja');
+        }
+        function setLang(lang) {
+            currentLang = lang;
+            applyLang();
+            updateStartBtn();
+            refreshSwBtn();
+            renderAlarms();
+            renderWorldClocks();
+        }
+        function refreshSwBtn() { swUpdateButtons(); }
+
         // ── Shared ───────────────────────────────────────────────────
         let currentTab = 'timer';
         let audioCtx = null;
         let masterGain = null;
         let selectedSound = 'trader';
         let customAudioBuffer = null;
+        let timerCustomMediaURL = null;
+        let alarmCustomAudioBuffer = null;
+        let alarmCustomMediaURL = null;
+        let timerCustomEl = null;
+        let alarmCustomEl = null;
 
         function pad(n) { return String(n).padStart(2, '0'); }
 
         function switchTab(tab) {
             currentTab = tab;
-            ['timer','alarm','sw'].forEach(t => {
+            ['timer','alarm','sw','world'].forEach(t => {
                 document.getElementById('nav-' + t).classList.toggle('active', t === tab);
                 document.getElementById('panel-' + t).style.display = t === tab ? '' : 'none';
             });
         }
+
+        let _activeMediaEl = null;
 
         function initAudio() {
             if (!audioCtx) {
@@ -819,6 +1026,15 @@
                 masterGain = audioCtx.createGain();
                 masterGain.gain.value = parseInt(document.getElementById('volumeSlider').value) / 100;
                 masterGain.connect(audioCtx.destination);
+            }
+        }
+
+        function resumeAndPlay(fn) {
+            initAudio();
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume().then(fn).catch(fn);
+            } else {
+                fn();
             }
         }
 
@@ -839,127 +1055,95 @@
         // ── Sound definitions ────────────────────────────────────────
         const sounds = {
             trader(ctx) {
-                // Bloomberg式: 3連続アセンディングビープ
+                // Bloomberg端末の3連ビープ — square波、880→1100→1320Hz 上昇
                 const now = ctx.currentTime;
                 [880,1100,1320].forEach((freq,i) => {
                     const osc=ctx.createOscillator(), g=ctx.createGain();
-                    osc.connect(g); g.connect(masterGain);
                     osc.type='square'; osc.frequency.value=freq;
-                    g.gain.setValueAtTime(0,now+i*0.10);
-                    g.gain.linearRampToValueAtTime(0.22,now+i*0.10+0.008);
-                    g.gain.setValueAtTime(0.22,now+i*0.10+0.062);
-                    g.gain.linearRampToValueAtTime(0,now+i*0.10+0.082);
-                    osc.start(now+i*0.10); osc.stop(now+i*0.10+0.09);
-                });
-            },
-            gun(ctx) {
-                // 銃声: ノイズバースト + サブベース
-                const now = ctx.currentTime;
-                const bufSize=Math.floor(ctx.sampleRate*0.35);
-                const buf=ctx.createBuffer(1,bufSize,ctx.sampleRate);
-                const d=buf.getChannelData(0);
-                for(let i=0;i<bufSize;i++) d[i]=Math.random()*2-1;
-                const src=ctx.createBufferSource(); src.buffer=buf;
-                const lpf=ctx.createBiquadFilter(); lpf.type='lowpass';
-                lpf.frequency.setValueAtTime(3000,now);
-                lpf.frequency.exponentialRampToValueAtTime(280,now+0.08);
-                const g=ctx.createGain();
-                g.gain.setValueAtTime(0.95,now);
-                g.gain.exponentialRampToValueAtTime(0.001,now+0.28);
-                src.connect(lpf); lpf.connect(g); g.connect(masterGain);
-                src.start(now); src.stop(now+0.35);
-                const sub=ctx.createOscillator(), sg=ctx.createGain();
-                sub.connect(sg); sg.connect(masterGain);
-                sub.type='sine';
-                sub.frequency.setValueAtTime(180,now);
-                sub.frequency.exponentialRampToValueAtTime(32,now+0.20);
-                sg.gain.setValueAtTime(0.95,now);
-                sg.gain.exponentialRampToValueAtTime(0.001,now+0.24);
-                sub.start(now); sub.stop(now+0.28);
-            },
-            cyber(ctx) {
-                // サイバー: ソウ波スイープ + グリッチ
-                const now = ctx.currentTime;
-                const osc=ctx.createOscillator();
-                const dist=ctx.createWaveShaper();
-                const curve=new Float32Array(256);
-                for(let i=0;i<256;i++){const x=i*2/255-1; curve[i]=x<0?-Math.pow(-x,0.6):Math.pow(x,0.6);}
-                dist.curve=curve;
-                const g=ctx.createGain();
-                osc.connect(dist); dist.connect(g); g.connect(masterGain);
-                osc.type='sawtooth';
-                osc.frequency.setValueAtTime(55,now);
-                osc.frequency.exponentialRampToValueAtTime(1100,now+0.14);
-                osc.frequency.exponentialRampToValueAtTime(380,now+0.28);
-                g.gain.setValueAtTime(0,now);
-                g.gain.linearRampToValueAtTime(0.38,now+0.01);
-                g.gain.setValueAtTime(0.38,now+0.11);
-                g.gain.linearRampToValueAtTime(0.12,now+0.15);
-                g.gain.linearRampToValueAtTime(0.28,now+0.18);
-                g.gain.exponentialRampToValueAtTime(0.001,now+0.48);
-                osc.start(now); osc.stop(now+0.52);
-                const osc2=ctx.createOscillator(), g2=ctx.createGain();
-                osc2.connect(g2); g2.connect(masterGain);
-                osc2.type='square';
-                osc2.frequency.setValueAtTime(3200,now+0.14);
-                osc2.frequency.setValueAtTime(1600,now+0.20);
-                osc2.frequency.setValueAtTime(2400,now+0.25);
-                g2.gain.setValueAtTime(0,now+0.14);
-                g2.gain.linearRampToValueAtTime(0.07,now+0.145);
-                g2.gain.exponentialRampToValueAtTime(0.001,now+0.38);
-                osc2.start(now+0.14); osc2.stop(now+0.4);
-            },
-            sparring(ctx) {
-                // ボクシングベル: インパクト + 持続するリング音
-                const now = ctx.currentTime;
-                const cBuf=ctx.createBuffer(1,Math.floor(ctx.sampleRate*0.018),ctx.sampleRate);
-                const cd=cBuf.getChannelData(0);
-                for(let i=0;i<cd.length;i++) cd[i]=Math.random()*2-1;
-                const click=ctx.createBufferSource(); click.buffer=cBuf;
-                const bpf=ctx.createBiquadFilter(); bpf.type='bandpass';
-                bpf.frequency.value=5000; bpf.Q.value=0.4;
-                const cg=ctx.createGain();
-                cg.gain.setValueAtTime(0.65,now);
-                cg.gain.exponentialRampToValueAtTime(0.001,now+0.018);
-                click.connect(bpf); bpf.connect(cg); cg.connect(masterGain);
-                click.start(now);
-                [[520,0.38,2.0],[1040,0.20,1.3],[1560,0.12,0.85],[2080,0.07,0.55]].forEach(([freq,amp,decay])=>{
-                    const osc=ctx.createOscillator(), g=ctx.createGain();
+                    g.gain.setValueAtTime(0,now+i*0.11);
+                    g.gain.linearRampToValueAtTime(0.20,now+i*0.11+0.007);
+                    g.gain.setValueAtTime(0.20,now+i*0.11+0.065);
+                    g.gain.linearRampToValueAtTime(0,now+i*0.11+0.085);
                     osc.connect(g); g.connect(masterGain);
-                    osc.type='sine'; osc.frequency.value=freq;
-                    g.gain.setValueAtTime(amp,now);
-                    g.gain.exponentialRampToValueAtTime(0.001,now+decay);
-                    osc.start(now); osc.stop(now+decay+0.05);
+                    osc.start(now+i*0.11); osc.stop(now+i*0.11+0.10);
                 });
             },
-            hiphop(ctx) {
-                // 808キック + スネア + ハイハット
+            gym(ctx) {
+                // ゲームブザー — ハードクリップした矩形波でざらついた電子ブザー音
                 const now = ctx.currentTime;
-                const kick=ctx.createOscillator(), kg=ctx.createGain();
-                kick.connect(kg); kg.connect(masterGain);
-                kick.type='sine';
-                kick.frequency.setValueAtTime(165,now);
-                kick.frequency.exponentialRampToValueAtTime(32,now+0.38);
-                kg.gain.setValueAtTime(1.0,now);
-                kg.gain.exponentialRampToValueAtTime(0.001,now+0.48);
-                kick.start(now); kick.stop(now+0.52);
-                const mkBuf=(dur)=>{const b=ctx.createBuffer(1,Math.floor(ctx.sampleRate*dur),ctx.sampleRate);const d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;return b;};
-                const sTime=now+0.30;
-                const snare=ctx.createBufferSource(); snare.buffer=mkBuf(0.12);
-                const hpf=ctx.createBiquadFilter(); hpf.type='highpass'; hpf.frequency.value=1800;
-                const sGain=ctx.createGain();
-                sGain.gain.setValueAtTime(0.6,sTime);
-                sGain.gain.exponentialRampToValueAtTime(0.001,sTime+0.10);
-                snare.connect(hpf); hpf.connect(sGain); sGain.connect(masterGain);
-                snare.start(sTime);
-                const hTime=now+0.15;
-                const hat=ctx.createBufferSource(); hat.buffer=mkBuf(0.04);
-                const hhpf=ctx.createBiquadFilter(); hhpf.type='highpass'; hhpf.frequency.value=9000;
-                const hGain=ctx.createGain();
-                hGain.gain.setValueAtTime(0.18,hTime);
-                hGain.gain.exponentialRampToValueAtTime(0.001,hTime+0.032);
-                hat.connect(hhpf); hhpf.connect(hGain); hGain.connect(masterGain);
-                hat.start(hTime);
+                const osc=ctx.createOscillator(), dist=ctx.createWaveShaper(), g=ctx.createGain();
+                const curve=new Float32Array(512);
+                for(let i=0;i<512;i++){const x=i*2/511-1; curve[i]=Math.max(-0.55,Math.min(0.55,x*12))/0.55;}
+                dist.curve=curve;
+                osc.type='sine'; osc.frequency.value=155;
+                g.gain.setValueAtTime(0,now); g.gain.linearRampToValueAtTime(0.72,now+0.008);
+                g.gain.setValueAtTime(0.70,now+0.55); g.gain.exponentialRampToValueAtTime(0.001,now+0.70);
+                osc.connect(dist); dist.connect(g); g.connect(masterGain); osc.start(now); osc.stop(now+0.75);
+                // 上倍音層 (ブザーのギラつき)
+                const osc2=ctx.createOscillator(), g2=ctx.createGain();
+                osc2.type='square'; osc2.frequency.value=310;
+                g2.gain.setValueAtTime(0,now); g2.gain.linearRampToValueAtTime(0.12,now+0.01);
+                g2.gain.setValueAtTime(0.11,now+0.50); g2.gain.exponentialRampToValueAtTime(0.001,now+0.68);
+                osc2.connect(g2); g2.connect(masterGain); osc2.start(now); osc2.stop(now+0.72);
+            },
+            car(ctx) {
+                // 緊急サイレン — 鋸波が700Hz↔1400Hzをスイープ (ウーウー1サイクル)
+                const now = ctx.currentTime;
+                const osc=ctx.createOscillator(), g=ctx.createGain();
+                osc.type='sawtooth';
+                osc.frequency.setValueAtTime(700,now);
+                osc.frequency.linearRampToValueAtTime(1400,now+0.38);
+                osc.frequency.linearRampToValueAtTime(700,now+0.76);
+                g.gain.setValueAtTime(0,now); g.gain.linearRampToValueAtTime(0.48,now+0.018);
+                g.gain.setValueAtTime(0.46,now+0.68); g.gain.exponentialRampToValueAtTime(0.001,now+0.85);
+                osc.connect(g); g.connect(masterGain); osc.start(now); osc.stop(now+0.90);
+                // 低域厚み (実際のサイレンは車体共鳴で低音も出る)
+                const sub=ctx.createOscillator(), sg=ctx.createGain();
+                sub.type='sine'; sub.frequency.setValueAtTime(350,now); sub.frequency.linearRampToValueAtTime(700,now+0.38); sub.frequency.linearRampToValueAtTime(350,now+0.76);
+                sg.gain.setValueAtTime(0,now); sg.gain.linearRampToValueAtTime(0.20,now+0.02);
+                sg.gain.exponentialRampToValueAtTime(0.001,now+0.82);
+                sub.connect(sg); sg.connect(masterGain); sub.start(now); sub.stop(now+0.88);
+            },
+            boxing(ctx) {
+                // ボクシングベル — 打撃クリック + 複数サイン倍音の長い余韻
+                const now = ctx.currentTime;
+                const sr=ctx.sampleRate;
+                const mkN=(dur)=>{const b=ctx.createBuffer(1,Math.floor(sr*dur),sr);const d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;return b;};
+                // ハンマー打撃 (極短ワイドバンドノイズ)
+                const clk=ctx.createBufferSource(); clk.buffer=mkN(0.014);
+                const chpf=ctx.createBiquadFilter(); chpf.type='highpass'; chpf.frequency.value=4000;
+                const cg=ctx.createGain(); cg.gain.setValueAtTime(0.75,now); cg.gain.exponentialRampToValueAtTime(0.001,now+0.014);
+                clk.connect(chpf); chpf.connect(cg); cg.connect(masterGain); clk.start(now);
+                // ベル本体の倍音 (実際のボクシングベルは540Hz基音)
+                [[540,0.50,1.9],[1080,0.22,1.2],[1620,0.11,0.72],[2160,0.06,0.44],[2916,0.03,0.28]].forEach(([f,amp,dec])=>{
+                    const o=ctx.createOscillator(), g=ctx.createGain();
+                    o.type='sine'; o.frequency.value=f;
+                    g.gain.setValueAtTime(amp,now); g.gain.exponentialRampToValueAtTime(0.001,now+dec);
+                    o.connect(g); g.connect(masterGain); o.start(now); o.stop(now+dec+0.05);
+                });
+            },
+            space(ctx) {
+                // 宇宙アラーム — フェーザー風スイープ + 深い空間的ドローン
+                const now = ctx.currentTime;
+                const sr=ctx.sampleRate;
+                // メインスイープ: 正弦波 1200Hz→200Hz (SFアラームの定番)
+                const osc=ctx.createOscillator(), g=ctx.createGain();
+                osc.type='sine'; osc.frequency.setValueAtTime(1200,now); osc.frequency.exponentialRampToValueAtTime(200,now+0.45);
+                g.gain.setValueAtTime(0,now); g.gain.linearRampToValueAtTime(0.45,now+0.015); g.gain.exponentialRampToValueAtTime(0.001,now+0.55);
+                osc.connect(g); g.connect(masterGain); osc.start(now); osc.stop(now+0.60);
+                // エコー (宇宙の残響 — 遅延＋ゲイン低減)
+                [0.18, 0.36].forEach((dt,i)=>{
+                    const o2=ctx.createOscillator(), g2=ctx.createGain();
+                    o2.type='sine'; o2.frequency.setValueAtTime(1200,now+dt); o2.frequency.exponentialRampToValueAtTime(200,now+dt+0.45);
+                    const amp=0.18/(i+1);
+                    g2.gain.setValueAtTime(0,now+dt); g2.gain.linearRampToValueAtTime(amp,now+dt+0.015); g2.gain.exponentialRampToValueAtTime(0.001,now+dt+0.50);
+                    o2.connect(g2); g2.connect(masterGain); o2.start(now+dt); o2.stop(now+dt+0.55);
+                });
+                // 低域サブドローン (宇宙の静寂感)
+                const drone=ctx.createOscillator(), dg=ctx.createGain();
+                drone.type='sine'; drone.frequency.value=55;
+                dg.gain.setValueAtTime(0,now); dg.gain.linearRampToValueAtTime(0.18,now+0.05); dg.gain.exponentialRampToValueAtTime(0.001,now+0.8);
+                drone.connect(dg); dg.connect(masterGain); drone.start(now); drone.stop(now+0.85);
             }
         };
 
@@ -970,7 +1154,7 @@
             document.getElementById('uploadZone').classList.remove('selected-sound');
         }
         function selectCustomSound() {
-            if (!customAudioBuffer) return;
+            if (!customAudioBuffer && !timerCustomEl) return;
             selectedSound = 'custom';
             document.querySelectorAll('.sound-card').forEach(c => c.classList.remove('selected'));
             document.getElementById('uploadZone').classList.add('selected-sound');
@@ -982,36 +1166,122 @@
             sounds[name](audioCtx);
             setTimeout(() => { btn.classList.remove('playing'); btn.textContent = '▶ Play'; }, 800);
         }
-        function previewCustomSound(e) { e.stopPropagation(); if (!customAudioBuffer) return; initAudio(); playCustomBuffer(); }
+        function previewCustomSound(e) { e.stopPropagation(); if (!customAudioBuffer && !timerCustomEl) return; resumeAndPlay(() => playCustomBuffer()); }
+        function playMediaURL(url) {
+            if (_activeMediaEl) { _activeMediaEl.pause(); _activeMediaEl.src = ''; _activeMediaEl = null; }
+            const audio = new Audio(url);
+            _activeMediaEl = audio;
+            audio.volume = masterGain ? Math.min(1, masterGain.gain.value) : 1;
+            audio.play().catch(() => {});
+        }
         function playCustomBuffer() {
-            const src = audioCtx.createBufferSource();
-            src.buffer = customAudioBuffer; src.connect(masterGain); src.start(0);
+            if (customAudioBuffer) {
+                try {
+                    const src = audioCtx.createBufferSource();
+                    src.buffer = customAudioBuffer; src.connect(masterGain);
+                    src.start(audioCtx.currentTime);
+                    return;
+                } catch(e) {}
+            }
+            if (timerCustomEl) {
+                timerCustomEl.currentTime = 0;
+                timerCustomEl.volume = masterGain ? Math.min(1, masterGain.gain.value) : 1;
+                timerCustomEl.play().catch(() => {});
+            }
+        }
+        function playAlarmCustom() {
+            if (alarmCustomAudioBuffer) {
+                try {
+                    const src = audioCtx.createBufferSource();
+                    src.buffer = alarmCustomAudioBuffer; src.connect(masterGain);
+                    src.start(audioCtx.currentTime);
+                    return;
+                } catch(e) {}
+            }
+            if (alarmCustomEl) {
+                alarmCustomEl.currentTime = 0;
+                alarmCustomEl.volume = masterGain ? Math.min(1, masterGain.gain.value) : 1;
+                alarmCustomEl.play().catch(() => {});
+            }
         }
         function playAlert() {
-            initAudio();
-            if (selectedSound === 'custom' && customAudioBuffer) playCustomBuffer();
-            else sounds[selectedSound](audioCtx);
+            resumeAndPlay(() => {
+                if (selectedSound === 'custom') playCustomBuffer();
+                else sounds[selectedSound](audioCtx);
+            });
         }
 
         // ── File upload ──────────────────────────────────────────────
+        function isMediaFile(file) {
+            return file.type.startsWith('audio/') || file.type.startsWith('video/') ||
+                   /\.(mp4|mov|m4v|webm|3gp|mkv|aac|flac|opus)$/i.test(file.name);
+        }
+        function setUploadUI(ids, icon, title, filename, hint, showPreview, loaded) {
+            document.getElementById(ids.icon).textContent = icon;
+            document.getElementById(ids.title).textContent = title;
+            const fn = document.getElementById(ids.filename);
+            fn.textContent = filename; fn.style.display = filename ? 'block' : 'none';
+            document.getElementById(ids.hint).textContent = hint;
+            document.getElementById(ids.previewBtn).style.display = showPreview ? 'block' : 'none';
+            document.getElementById(ids.zone).classList.toggle('loaded', loaded);
+        }
+        function makeCustomEl(file) {
+            const url = URL.createObjectURL(file);
+            const el = new Audio(url);
+            el.preload = 'auto';
+            return el;
+        }
         function handleFileLoad(file) {
-            if (!file || !file.type.startsWith('audio/')) return;
+            if (!file || !isMediaFile(file)) return;
             initAudio();
+            if (timerCustomEl) { timerCustomEl.src = ''; timerCustomEl = null; }
+            timerCustomEl = makeCustomEl(file);
             const reader = new FileReader();
             reader.onload = e => {
-                audioCtx.decodeAudioData(e.target.result).then(buf => {
-                    customAudioBuffer = buf;
-                    document.getElementById('uploadIcon').textContent = '🎧';
-                    document.getElementById('uploadTitle').textContent = 'カスタム音声';
-                    const n = document.getElementById('uploadFilename');
-                    n.textContent = file.name; n.style.display = 'block';
-                    document.getElementById('uploadHint').textContent = 'クリックで変更';
-                    document.getElementById('uploadPreviewBtn').style.display = 'block';
-                    document.getElementById('uploadZone').classList.add('loaded');
-                    selectCustomSound();
-                }).catch(() => { document.getElementById('uploadHint').textContent = '読み込み失敗'; });
+                audioCtx.decodeAudioData(e.target.result.slice(0))
+                    .then(buf => {
+                        customAudioBuffer = buf;
+                        setUploadUI({icon:'uploadIcon',title:'uploadTitle',filename:'uploadFilename',hint:'uploadHint',previewBtn:'uploadPreviewBtn',zone:'uploadZone'},
+                            '🎧',t('upload_title'),file.name,t('upload_hint'),true,true);
+                        selectCustomSound();
+                    })
+                    .catch(() => {
+                        customAudioBuffer = null;
+                        setUploadUI({icon:'uploadIcon',title:'uploadTitle',filename:'uploadFilename',hint:'uploadHint',previewBtn:'uploadPreviewBtn',zone:'uploadZone'},
+                            '🎬',t('upload_title'),file.name,t('upload_hint'),true,true);
+                        selectCustomSound();
+                    });
             };
             reader.readAsArrayBuffer(file);
+        }
+        function handleAlarmFileLoad(file) {
+            if (!file || !isMediaFile(file)) return;
+            initAudio();
+            if (alarmCustomEl) { alarmCustomEl.src = ''; alarmCustomEl = null; }
+            alarmCustomEl = makeCustomEl(file);
+            const reader = new FileReader();
+            reader.onload = e => {
+                audioCtx.decodeAudioData(e.target.result.slice(0))
+                    .then(buf => {
+                        alarmCustomAudioBuffer = buf;
+                        setUploadUI({icon:'alarmUploadIcon',title:'alarmUploadTitle',filename:'alarmUploadFilename',hint:'alarmUploadHint',previewBtn:'alarmUploadPreviewBtn',zone:'alarmUploadZone'},
+                            '🎧',t('upload_title'),file.name,t('upload_hint'),true,true);
+                        selectAlarmCustomSound();
+                    })
+                    .catch(() => {
+                        alarmCustomAudioBuffer = null;
+                        setUploadUI({icon:'alarmUploadIcon',title:'alarmUploadTitle',filename:'alarmUploadFilename',hint:'alarmUploadHint',previewBtn:'alarmUploadPreviewBtn',zone:'alarmUploadZone'},
+                            '🎬',t('upload_title'),file.name,t('upload_hint'),true,true);
+                        selectAlarmCustomSound();
+                    });
+            };
+            reader.readAsArrayBuffer(file);
+        }
+        function selectAlarmCustomSound() {
+            if (!alarmCustomAudioBuffer && !alarmCustomEl) return;
+            alarmSelectedSound = 'custom';
+            document.querySelectorAll('#alarmSoundGrid .sound-card').forEach(c => c.classList.remove('selected'));
+            document.getElementById('alarmUploadZone').classList.add('selected-sound');
         }
         document.getElementById('uploadZone').addEventListener('click', () => document.getElementById('audioUpload').click());
         document.getElementById('audioUpload').addEventListener('change', e => handleFileLoad(e.target.files[0]));
@@ -1019,6 +1289,12 @@
         zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
         zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
         zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('dragover'); handleFileLoad(e.dataTransfer.files[0]); });
+        document.getElementById('alarmUploadZone').addEventListener('click', () => document.getElementById('alarmAudioUpload').click());
+        document.getElementById('alarmAudioUpload').addEventListener('change', e => handleAlarmFileLoad(e.target.files[0]));
+        const alarmZone = document.getElementById('alarmUploadZone');
+        alarmZone.addEventListener('dragover', e => { e.preventDefault(); alarmZone.classList.add('dragover'); });
+        alarmZone.addEventListener('dragleave', () => alarmZone.classList.remove('dragover'));
+        alarmZone.addEventListener('drop', e => { e.preventDefault(); alarmZone.classList.remove('dragover'); handleAlarmFileLoad(e.dataTransfer.files[0]); });
 
         // ── Timer ────────────────────────────────────────────────────
         let timerInterval = null;
@@ -1111,9 +1387,9 @@
         }
         function updateStartBtn() {
             const btn = document.getElementById('startBtn');
-            if (timerState==='idle') { btn.textContent='▶ Start'; btn.classList.remove('paused'); }
-            else if (timerState==='running') { btn.textContent='⏸ Pause'; btn.classList.remove('paused'); }
-            else { btn.textContent='▶ Resume'; btn.classList.add('paused'); }
+            if (timerState==='idle') { btn.textContent=t('btn_start'); btn.classList.remove('paused'); }
+            else if (timerState==='running') { btn.textContent=t('btn_pause'); btn.classList.remove('paused'); }
+            else { btn.textContent=t('btn_resume'); btn.classList.add('paused'); }
         }
         function handleStartBtn() {
             if (timerState==='idle') startTimer();
@@ -1140,7 +1416,7 @@
             document.getElementById('elapsedTime').textContent='00:00';
             document.getElementById('stopBtn').disabled=false;
             document.getElementById('statusDot').className='status-dot running';
-            document.getElementById('statusText').textContent='Running';
+            document.getElementById('statusText').textContent=t('status_running');
             document.getElementById('countdown').textContent=formatTime(countdownValue);
             setTimerInputsDisabled(true);
             timerState='running'; updateStartBtn(); resetProgress();
@@ -1161,14 +1437,14 @@
             clearInterval(timerInterval); clearInterval(elapsedInterval); timerInterval=null;
             timerState='paused';
             document.getElementById('statusDot').className='status-dot paused';
-            document.getElementById('statusText').textContent='Paused';
+            document.getElementById('statusText').textContent=t('status_paused');
             document.title=`⏸ ${formatTime(countdownValue)} — TIME HACK`;
             updateStartBtn();
         }
         function resumeTimer() {
             timerState='running';
             document.getElementById('statusDot').className='status-dot running';
-            document.getElementById('statusText').textContent='Running';
+            document.getElementById('statusText').textContent=t('status_running');
             updateStartBtn();
             timerInterval = setInterval(() => {
                 countdownValue--;
@@ -1188,7 +1464,7 @@
             seqStepIdx=0; seqRepCount=0;
             document.getElementById('stopBtn').disabled=true;
             document.getElementById('statusDot').className='status-dot';
-            document.getElementById('statusText').textContent='Standby';
+            document.getElementById('statusText').textContent=t('status_standby');
             document.getElementById('countdown').textContent='--:--:--';
             document.getElementById('progressFill').style.width='0%';
             document.getElementById('seqStatus').style.display='none';
@@ -1275,77 +1551,138 @@
         }
 
         // ── Alarm ────────────────────────────────────────────────────
-        let alarmSet = false;
-        let alarmHour = 0;
-        let alarmMin = 0;
-        let alarmFired = false;
-        let alarmRingInterval = null;
+        let alarmSelectedSound = 'trader';
+        let alarmIdCounter = 0;
+        let alarms = [];
+        let firingAlarmId = null;
+        const ALARM_SOUND_ICONS = { trader:'📈', gym:'📯', car:'🚨', boxing:'🥊', space:'🚀', custom:'🎵' };
 
-        function setAlarm() {
-            alarmHour = Math.max(0,Math.min(23,parseInt(document.getElementById('alarmH').value)||0));
-            alarmMin  = Math.max(0,Math.min(59,parseInt(document.getElementById('alarmM').value)||0));
-            alarmSet = true;
-            alarmFired = false;
-            document.getElementById('alarmBigTime').textContent = `${pad(alarmHour)}:${pad(alarmMin)}`;
-            document.getElementById('alarmBigTime').classList.remove('firing');
-            document.getElementById('alarmDot').className = 'status-dot alarm-on';
-            document.getElementById('alarmStatusTxt').textContent = 'Alarm Set';
-            document.getElementById('alarmSnoozeBtn').style.display = 'none';
-            document.getElementById('alarmStatus').style.display = '';
-            document.getElementById('alarmSetBtn').textContent = '✎ Edit';
-            updateAlarmCountdown();
+        function selectAlarmSound(name, card) {
+            alarmSelectedSound = name;
+            document.querySelectorAll('#alarmSoundGrid .sound-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            document.getElementById('alarmUploadZone').classList.remove('selected-sound');
         }
-        function cancelAlarm() {
-            clearInterval(alarmRingInterval); alarmRingInterval=null;
-            alarmSet=false; alarmFired=false;
-            document.getElementById('alarmStatus').style.display='none';
-            document.getElementById('alarmSetBtn').textContent='⏰ Set Alarm';
-            document.getElementById('alarmNotif').classList.remove('visible');
+        function playAlarmSoundFor(alarm) {
+            resumeAndPlay(() => {
+                if (alarm.sound === 'custom') {
+                    if (alarm.customBuffer) {
+                        const src = audioCtx.createBufferSource();
+                        src.buffer = alarm.customBuffer; src.connect(masterGain); src.start();
+                    } else if (alarm.customEl) {
+                        alarm.customEl.currentTime = 0;
+                        alarm.customEl.volume = masterGain ? Math.min(1, masterGain.gain.value) : 1;
+                        alarm.customEl.play().catch(()=>{});
+                    }
+                } else {
+                    sounds[alarm.sound](audioCtx);
+                }
+            });
         }
-        function fireAlarm() {
-            alarmFired = true;
-            initAudio(); playAlert(); flashOverlay();
-            alarmRingInterval = setInterval(() => { initAudio(); playAlert(); }, 3000);
-            document.getElementById('alarmBigTime').classList.add('firing');
-            document.getElementById('alarmDot').className = 'status-dot running';
-            document.getElementById('alarmStatusTxt').textContent = 'RINGING!';
-            document.getElementById('alarmSnoozeBtn').style.display = '';
-            document.getElementById('alarmCountdownText').textContent = 'ALARM!';
-            document.getElementById('alarmNotifTime').textContent = `${pad(alarmHour)}:${pad(alarmMin)}`;
-            document.getElementById('alarmNotif').classList.add('visible');
+        function sendAlarmNotif(alarm) {
+            if (!('Notification' in window) || Notification.permission !== 'granted') return;
+            new Notification('TIME HACK', { body: alarm.label || '⏰ Wake up!' });
         }
-        function dismissAlarm() {
-            clearInterval(alarmRingInterval); alarmRingInterval=null;
-            document.getElementById('alarmNotif').classList.remove('visible');
-            cancelAlarm();
+        function updateNotifHint() {
+            const el = document.getElementById('notifPermHint');
+            if (!el) return;
+            if (!('Notification' in window)) { el.textContent = '⚠ Notifications not supported'; return; }
+            if (Notification.permission === 'granted') el.textContent = '✓ Notifications enabled';
+            else if (Notification.permission === 'denied') el.textContent = '✗ Notifications blocked — allow in browser settings';
+            else el.textContent = '';
         }
-        function snoozeAlarm() {
-            clearInterval(alarmRingInterval); alarmRingInterval=null;
-            document.getElementById('alarmNotif').classList.remove('visible');
-            const d = new Date();
-            d.setMinutes(d.getMinutes()+5);
-            alarmHour = d.getHours();
-            alarmMin  = d.getMinutes();
-            alarmFired = false;
-            document.getElementById('alarmBigTime').textContent = `${pad(alarmHour)}:${pad(alarmMin)}`;
-            document.getElementById('alarmBigTime').classList.remove('firing');
-            document.getElementById('alarmDot').className = 'status-dot alarm-on';
-            document.getElementById('alarmStatusTxt').textContent = 'Snoozed (+5m)';
-            document.getElementById('alarmSnoozeBtn').style.display='none';
-            document.getElementById('alarmH').value = alarmHour;
-            document.getElementById('alarmM').value = alarmMin;
-        }
-        function updateAlarmCountdown() {
-            if (!alarmSet || alarmFired) return;
+        function getAlarmCountdownText(alarm) {
             const now = new Date();
             const target = new Date(now);
-            target.setHours(alarmHour, alarmMin, 0, 0);
-            if (target <= now) target.setDate(target.getDate()+1);
+            target.setHours(alarm.hour, alarm.min, 0, 0);
+            if (target <= now) target.setDate(target.getDate() + 1);
             const diff = Math.floor((target - now) / 1000);
-            const h = Math.floor(diff/3600), m = Math.floor((diff%3600)/60), s = diff%60;
+            const h = Math.floor(diff / 3600), m = Math.floor((diff % 3600) / 60), s = diff % 60;
             const tomorrow = target.getDate() !== now.getDate();
-            document.getElementById('alarmCountdownText').textContent =
-                (tomorrow ? '明日 ' : '') + `in ${h>0?h+'h ':''}${m}m ${s}s`;
+            return (tomorrow ? '明日 ' : '') + `in ${h > 0 ? h + 'h ' : ''}${m}m ${s}s`;
+        }
+        function renderAlarms() {
+            const list = document.getElementById('alarmList');
+            if (alarms.length === 0) { list.innerHTML = ''; return; }
+            list.innerHTML = alarms.map(a => {
+                const timeStr = `${pad(a.hour)}:${pad(a.min)}`;
+                const countdown = a.fired ? 'RINGING!' : getAlarmCountdownText(a);
+                const icon = ALARM_SOUND_ICONS[a.sound] || '🔔';
+                return `<div class="alarm-item${a.fired ? ' firing' : ''}" id="alarm-item-${a.id}">
+                    <div class="alarm-item-time">${timeStr}</div>
+                    <div class="alarm-item-info">
+                        <div class="alarm-item-label">${a.label}</div>
+                        <div class="alarm-item-countdown" id="alarm-cd-${a.id}">${countdown}</div>
+                    </div>
+                    <div class="alarm-item-sound">${icon}</div>
+                    <div class="alarm-item-btns">
+                        ${a.fired ? `<button class="alarm-item-btn snooze" onclick="snoozeAlarm(${a.id})">${t('btn_snooze')}</button>` : ''}
+                        <button class="alarm-item-btn danger" onclick="${a.fired ? 'dismissAlarm' : 'cancelAlarm'}(${a.id})">${a.fired ? t('btn_dismiss') : '✕'}</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+        function setAlarm() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission().then(updateNotifHint);
+            }
+            updateNotifHint();
+            const h = Math.max(0, Math.min(23, parseInt(document.getElementById('alarmH').value) || 0));
+            const m = Math.max(0, Math.min(59, parseInt(document.getElementById('alarmM').value) || 0));
+            const label = document.getElementById('alarmMsg').value.trim() || '⏰ Wake up!';
+            alarms.push({
+                id: ++alarmIdCounter,
+                hour: h, min: m, label,
+                sound: alarmSelectedSound,
+                customBuffer: alarmCustomAudioBuffer,
+                customEl: alarmCustomEl,
+                fired: false, ringInterval: null
+            });
+            renderAlarms();
+        }
+        function cancelAlarm(id) {
+            const idx = alarms.findIndex(a => a.id === id);
+            if (idx === -1) return;
+            clearInterval(alarms[idx].ringInterval);
+            alarms.splice(idx, 1);
+            if (firingAlarmId === id) {
+                firingAlarmId = null;
+                document.getElementById('alarmNotif').classList.remove('visible');
+            }
+            renderAlarms();
+        }
+        function fireAlarm(alarm) {
+            alarm.fired = true;
+            firingAlarmId = alarm.id;
+            playAlarmSoundFor(alarm); flashOverlay(); sendAlarmNotif(alarm);
+            alarm.ringInterval = setInterval(() => playAlarmSoundFor(alarm), 3000);
+            document.getElementById('alarmNotifTime').textContent = `${pad(alarm.hour)}:${pad(alarm.min)}`;
+            document.getElementById('alarmNotif').classList.add('visible');
+            renderAlarms();
+        }
+        function dismissAlarm(id) { cancelAlarm(id); }
+        function snoozeAlarm(id) {
+            const alarm = alarms.find(a => a.id === id);
+            if (!alarm) return;
+            clearInterval(alarm.ringInterval); alarm.ringInterval = null;
+            if (firingAlarmId === id) {
+                firingAlarmId = null;
+                document.getElementById('alarmNotif').classList.remove('visible');
+            }
+            const d = new Date();
+            d.setMinutes(d.getMinutes() + 5);
+            alarm.hour = d.getHours(); alarm.min = d.getMinutes();
+            alarm.fired = false;
+            renderAlarms();
+        }
+        function snoozeCurrentAlarm() { if (firingAlarmId !== null) snoozeAlarm(firingAlarmId); }
+        function dismissCurrentAlarm() { if (firingAlarmId !== null) dismissAlarm(firingAlarmId); }
+        function updateAlarmCountdowns() {
+            alarms.forEach(alarm => {
+                if (alarm.fired) return;
+                const el = document.getElementById(`alarm-cd-${alarm.id}`);
+                if (el) el.textContent = getAlarmCountdownText(alarm);
+            });
         }
 
         // ── Stopwatch ────────────────────────────────────────────────
@@ -1383,13 +1720,13 @@
             const r = document.getElementById('swResetBtn');
             const l = document.getElementById('swLapBtn');
             if (swState==='idle') {
-                s.textContent='▶ Start'; s.classList.remove('paused');
+                s.textContent=t('btn_start'); s.classList.remove('paused');
                 r.disabled=true; l.disabled=true;
             } else if (swState==='running') {
-                s.textContent='⏸ Pause'; s.classList.remove('paused');
+                s.textContent=t('btn_pause'); s.classList.remove('paused');
                 r.disabled=true; l.disabled=false;
             } else {
-                s.textContent='▶ Resume'; s.classList.add('paused');
+                s.textContent=t('btn_resume'); s.classList.add('paused');
                 r.disabled=false; l.disabled=true;
             }
         }
@@ -1401,8 +1738,8 @@
         function swStart() {
             swElapsedMs=0; swLaps=[]; swStartMs=Date.now(); swRunning=true; swState='running';
             document.getElementById('swDot').className='status-dot running';
-            document.getElementById('swStatus').textContent='Running';
-            document.getElementById('swLapList').innerHTML='<div class="sw-empty" id="swEmpty">No laps recorded</div>';
+            document.getElementById('swStatus').textContent=t('status_running');
+            document.getElementById('swLapList').innerHTML=`<div class="sw-empty" id="swEmpty">${t('sw_no_laps')}</div>`;
             swUpdateButtons();
             swInterval = setInterval(swUpdateDisplay, 50);
         }
@@ -1410,13 +1747,13 @@
             swElapsedMs += Date.now()-swStartMs; swRunning=false; swState='paused';
             clearInterval(swInterval);
             document.getElementById('swDot').className='status-dot paused';
-            document.getElementById('swStatus').textContent='Paused';
+            document.getElementById('swStatus').textContent=t('status_paused');
             swUpdateButtons(); swUpdateDisplay();
         }
         function swResume() {
             swStartMs=Date.now(); swRunning=true; swState='running';
             document.getElementById('swDot').className='status-dot running';
-            document.getElementById('swStatus').textContent='Running';
+            document.getElementById('swStatus').textContent=t('status_running');
             swUpdateButtons();
             swInterval = setInterval(swUpdateDisplay, 50);
         }
@@ -1424,10 +1761,10 @@
             clearInterval(swInterval); swRunning=false; swState='idle';
             swElapsedMs=0; swStartMs=null; swLaps=[];
             document.getElementById('swDot').className='status-dot';
-            document.getElementById('swStatus').textContent='Ready';
+            document.getElementById('swStatus').textContent=t('status_ready');
             document.getElementById('swMain').textContent='00:00';
             document.getElementById('swCs').textContent='.00';
-            document.getElementById('swLapList').innerHTML='<div class="sw-empty" id="swEmpty">No laps recorded</div>';
+            document.getElementById('swLapList').innerHTML=`<div class="sw-empty" id="swEmpty">${t('sw_no_laps')}</div>`;
             swUpdateButtons();
         }
         function swLap() {
@@ -1439,7 +1776,7 @@
         }
         function renderLaps() {
             if (swLaps.length===0) {
-                document.getElementById('swLapList').innerHTML='<div class="sw-empty">No laps recorded</div>';
+                document.getElementById('swLapList').innerHTML=`<div class="sw-empty">${t('sw_no_laps')}</div>`;
                 return;
             }
             const splits = swLaps.map(l=>l.split);
@@ -1474,7 +1811,11 @@
             } else if (e.code==='Escape') {
                 if (currentTab==='timer' && timerState!=='idle') stopTimer();
                 else if (currentTab==='sw' && swState!=='idle') swReset();
-                else if (currentTab==='alarm' && alarmSet) cancelAlarm();
+                else if (currentTab==='alarm' && alarms.length > 0) {
+                    const firing = alarms.find(a => a.fired);
+                    if (firing) dismissAlarm(firing.id);
+                    else { const last = alarms[alarms.length - 1]; if (last) cancelAlarm(last.id); }
+                }
             }
         });
 
@@ -1491,7 +1832,7 @@
         }
         function drawClock() {
             const W=canvas.width,H=canvas.height,cx=W/2,cy=H/2,R=Math.min(W,H)/2-8;
-            const now=new Date(),h=now.getHours()%12,m=now.getMinutes(),s=now.getSeconds();
+            const {h,M:m,S:s,ms}=getZoneTime(clockTz);
             ctx2d.clearRect(0,0,W,H);
             ctx2d.fillStyle='#080808'; ctx2d.fillRect(0,0,W,H);
             const grad=ctx2d.createRadialGradient(cx,cy-R*0.25,R*0.05,cx,cy,R);
@@ -1516,32 +1857,163 @@
                 const a=(i/12)*Math.PI*2-Math.PI/2,nr=R-34;
                 ctx2d.fillText(String(i),cx+Math.cos(a)*nr,cy+Math.sin(a)*nr);
             }
-            drawHand(cx,cy,((h+m/60+s/3600)/12)*Math.PI*2-Math.PI/2,R*0.52,-R*0.1,7,'rgba(240,240,240,0.95)',false);
-            drawHand(cx,cy,((m+s/60)/60)*Math.PI*2-Math.PI/2,R*0.76,-R*0.12,4.5,'rgba(240,240,240,0.95)',false);
-            drawHand(cx,cy,(s/60)*Math.PI*2-Math.PI/2,R*0.83,-R*0.22,2,'#ffffff',true);
+            drawHand(cx,cy,((h+m/60+s/3600)/12)*Math.PI*2,R*0.52,-R*0.1,7,'rgba(240,240,240,0.95)',false);
+            drawHand(cx,cy,((m+s/60)/60)*Math.PI*2,R*0.76,-R*0.12,4.5,'rgba(240,240,240,0.95)',false);
+            drawHand(cx,cy,((s+ms/1000)/60)*Math.PI*2,R*0.83,-R*0.22,2,'#ffffff',true);
             ctx2d.beginPath(); ctx2d.arc(cx,cy,9,0,Math.PI*2);
             ctx2d.fillStyle='#ffffff'; ctx2d.shadowColor='#ffffff'; ctx2d.shadowBlur=12; ctx2d.fill(); ctx2d.shadowBlur=0;
             ctx2d.beginPath(); ctx2d.arc(cx,cy,4,0,Math.PI*2);
             ctx2d.fillStyle='rgba(240,240,240,0.95)'; ctx2d.fill();
         }
         function updateClock() {
-            const now = new Date();
-            const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-            document.getElementById('clockTime').textContent =
-                `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-            document.getElementById('clockYear').textContent = now.getFullYear();
-            document.getElementById('clockMonthDay').textContent =
-                `${pad(now.getMonth()+1)}/${pad(now.getDate())}`;
-            document.getElementById('clockDOW').textContent = days[now.getDay()];
+            const {H,M,S} = getZoneTime(clockTz);
+            const {year,month,day,weekday} = getZoneDateParts(clockTz);
+            document.getElementById('clockTime').textContent = `${pad(H)}:${pad(M)}:${pad(S)}`;
+            document.getElementById('clockYear').textContent = year;
+            document.getElementById('clockMonthDay').textContent = `${month}/${day}`;
+            document.getElementById('clockDOW').textContent = weekday;
             drawClock();
             // Alarm check
-            if (alarmSet && !alarmFired) {
-                if (now.getHours()===alarmHour && now.getMinutes()===alarmMin) fireAlarm();
-                else updateAlarmCountdown();
-            }
+            alarms.forEach(alarm => {
+                if (!alarm.fired && H === alarm.hour && M === alarm.min) fireAlarm(alarm);
+            });
+            updateAlarmCountdowns();
+            updateWorldClocks();
         }
+        let clockTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        function getZoneTime(tz) {
+            const now = new Date();
+            const parts = new Intl.DateTimeFormat('en', {
+                timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+            }).formatToParts(now);
+            const get = t => parseInt(parts.find(p => p.type === t).value);
+            const H = get('hour') % 24;
+            return { H, h: H % 12, M: get('minute'), S: get('second'), ms: now.getMilliseconds() };
+        }
+        function getZoneDateParts(tz) {
+            const parts = new Intl.DateTimeFormat('en', {
+                timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short'
+            }).formatToParts(new Date());
+            const get = t => parts.find(p => p.type === t)?.value ?? '';
+            return { year: get('year'), month: get('month'), day: get('day'), weekday: get('weekday') };
+        }
+        function setClockTz(tz) { clockTz = tz; }
+        const TZ_LIST = [
+            ['Pacific/Honolulu','Hawaii (HST)'],['America/Los_Angeles','Los Angeles (PST)'],
+            ['America/Denver','Denver (MST)'],['America/Chicago','Chicago (CST)'],
+            ['America/New_York','New York (EST)'],['America/Sao_Paulo','São Paulo (BRT)'],
+            ['UTC','UTC'],['Europe/London','London (GMT)'],['Europe/Paris','Paris (CET)'],
+            ['Europe/Helsinki','Helsinki (EET)'],['Europe/Moscow','Moscow (MSK)'],
+            ['Asia/Dubai','Dubai (GST)'],['Asia/Kolkata','India (IST)'],
+            ['Asia/Bangkok','Bangkok (ICT)'],['Asia/Singapore','Singapore (SGT)'],
+            ['Asia/Shanghai','Shanghai (CST)'],['Asia/Tokyo','Tokyo (JST)'],
+            ['Asia/Seoul','Seoul (KST)'],['Australia/Sydney','Sydney (AEST)'],
+        ];
+        (function initTzSelect() {
+            const sel = document.getElementById('clockTzSelect');
+            const local = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const inList = TZ_LIST.some(([tz]) => tz === local);
+            if (!inList) { const o = document.createElement('option'); o.value=local; o.textContent=local; o.selected=true; sel.appendChild(o); }
+            TZ_LIST.forEach(([tz, label]) => {
+                const o = document.createElement('option');
+                o.value = tz; o.textContent = label;
+                if (tz === local) o.selected = true;
+                sel.appendChild(o);
+            });
+            clockTz = sel.value;
+        })();
+        // ── World clock ─────────────────────────────────────────────
+        const WORLD_WEEKDAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        let worldClocks = [
+            { tz: 'America/New_York',  label: 'New York (EST)'   },
+            { tz: 'Europe/London',     label: 'London (GMT)'     },
+            { tz: 'Europe/Paris',      label: 'Paris (CET)'      },
+            { tz: 'Asia/Dubai',        label: 'Dubai (GST)'      },
+            { tz: 'Asia/Tokyo',        label: 'Tokyo (JST)'      },
+            { tz: 'Australia/Sydney',  label: 'Sydney (AEST)'    },
+        ];
+        const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+        function getWorldTime(tz) {
+            const now = new Date();
+            const parts = new Intl.DateTimeFormat('en', {
+                timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit',
+                year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short', hour12: false
+            }).formatToParts(now);
+            const get = t => parts.find(p => p.type === t)?.value ?? '';
+            const H = parseInt(get('hour')) % 24;
+            return {
+                time: `${pad(H)}:${pad(get('minute'))}:${pad(get('second'))}`,
+                date: `${get('year')}/${get('month')}/${get('day')} ${get('weekday').toUpperCase()}`
+            };
+        }
+
+        function renderWorldClocks() {
+            const list = document.getElementById('worldCityList');
+            list.innerHTML = worldClocks.map((c, i) => {
+                const { time, date } = getWorldTime(c.tz);
+                const isLocal = c.tz === localTz;
+                return `<div class="world-city-card${isLocal ? ' is-local' : ''}">
+                    <div class="world-city-left">
+                        <div class="world-city-name">${c.label}${isLocal ? ' ★' : ''}</div>
+                        <div class="world-city-time" id="wt-${i}">${time}</div>
+                        <div class="world-city-date" id="wd-${i}">${date}</div>
+                    </div>
+                    <button class="world-city-remove" onclick="removeWorldClock(${i})">✕</button>
+                </div>`;
+            }).join('');
+        }
+
+        function updateWorldClocks() {
+            worldClocks.forEach((c, i) => {
+                const te = document.getElementById(`wt-${i}`);
+                const de = document.getElementById(`wd-${i}`);
+                if (!te) return;
+                const { time, date } = getWorldTime(c.tz);
+                te.textContent = time;
+                de.textContent = date;
+            });
+        }
+
+        function addWorldClock() {
+            const sel = document.getElementById('worldTzSelect');
+            const tz = sel.value;
+            const label = sel.options[sel.selectedIndex].textContent;
+            if (worldClocks.some(c => c.tz === tz)) return;
+            worldClocks.push({ tz, label });
+            renderWorldClocks();
+        }
+
+        function removeWorldClock(i) {
+            worldClocks.splice(i, 1);
+            renderWorldClocks();
+        }
+
+        (function initWorldTzSelect() {
+            const sel = document.getElementById('worldTzSelect');
+            TZ_LIST.forEach(([tz, label]) => {
+                const o = document.createElement('option');
+                o.value = tz; o.textContent = label;
+                sel.appendChild(o);
+            });
+            renderWorldClocks();
+        })();
+
+        // ── Auto-scale to window ─────────────────────────────────────
+        function autoScale() {
+            const designW = 1440; // 基準デザイン幅
+            const vw = window.innerWidth;
+            const scale = vw >= designW ? 1 : Math.max(0.35, vw / designW);
+            document.documentElement.style.zoom = scale;
+        }
+        autoScale();
+        window.addEventListener('resize', autoScale);
+
+        applyLang();
         updateClock();
         setInterval(updateClock, 1000);
+        function clockAnimLoop() { drawClock(); requestAnimationFrame(clockAnimLoop); }
+        clockAnimLoop();
     </script>
 </body>
 </html>

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://CrystalBabyBoyG.github.io/Timehack/sitemap.xml
