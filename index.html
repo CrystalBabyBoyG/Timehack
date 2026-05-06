@@ -1568,6 +1568,9 @@
             }, 1000);
         }
         function stopTimer() {
+            if (_activeTimerCustomSrc) { try { _activeTimerCustomSrc.stop(); } catch(e) {} _activeTimerCustomSrc = null; }
+            if (timerCustomEl) { timerCustomEl.pause(); timerCustomEl.currentTime = 0; }
+            if (_activeMediaEl) { _activeMediaEl.pause(); _activeMediaEl.currentTime = 0; }
             clearInterval(timerInterval); clearInterval(elapsedInterval); timerInterval=null;
             timerState='idle';
             seqStepIdx=0; seqRepCount=0;
