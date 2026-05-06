@@ -1112,6 +1112,7 @@
         let alarmCustomMediaURL = null;
         let timerCustomEl = null;
         let alarmCustomEl = null;
+        let _activeTimerCustomSrc = null;
 
         function pad(n) { return String(n).padStart(2, '0'); }
 
@@ -1282,9 +1283,12 @@
         function playCustomBuffer() {
             if (customAudioBuffer) {
                 try {
+                    if (_activeTimerCustomSrc) { try { _activeTimerCustomSrc.stop(); } catch(e) {} _activeTimerCustomSrc = null; }
                     const src = audioCtx.createBufferSource();
                     src.buffer = customAudioBuffer; src.connect(masterGain);
                     src.start(audioCtx.currentTime);
+                    _activeTimerCustomSrc = src;
+                    src.onended = () => { if (_activeTimerCustomSrc === src) _activeTimerCustomSrc = null; };
                     return;
                 } catch(e) {}
             }
