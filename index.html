@@ -1124,7 +1124,7 @@
             ja: { timer: 'インターバルアラートシステム', alarm: 'アラームクロック', sw: 'ストップウォッチ', world: 'ワールドクロック' }
         };
         function updateTagline() {
-            document.getElementById('tagline').textContent = (TAGLINES[currentLang] || TAGLINES.en)[currentTab];
+            document.getElementById('tagline').textContent = TAGLINES.en[currentTab];
         }
         function switchTab(tab) {
             currentTab = tab;
