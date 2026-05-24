@@ -789,7 +789,7 @@
 
         <div class="grid-center">
             <div class="logo">TIME HACK</div>
-            <div class="tagline">Interval Alert System</div>
+            <div class="tagline" id="tagline">Interval Alert System</div>
 
             <div class="card">
                 <!-- ══ Timer panel ══ -->
@@ -1096,6 +1096,7 @@
         function setLang(lang) {
             currentLang = lang;
             applyLang();
+            updateTagline();
             updateStartBtn();
             refreshSwBtn();
             renderAlarms();
@@ -1118,12 +1119,20 @@
 
         function pad(n) { return String(n).padStart(2, '0'); }
 
+        const TAGLINES = {
+            en: { timer: 'Interval Alert System', alarm: 'Alarm Clock', sw: 'Stopwatch', world: 'World Clock' },
+            ja: { timer: 'インターバルアラートシステム', alarm: 'アラームクロック', sw: 'ストップウォッチ', world: 'ワールドクロック' }
+        };
+        function updateTagline() {
+            document.getElementById('tagline').textContent = (TAGLINES[currentLang] || TAGLINES.en)[currentTab];
+        }
         function switchTab(tab) {
             currentTab = tab;
             ['timer','alarm','sw','world'].forEach(t => {
                 document.getElementById('nav-' + t).classList.toggle('active', t === tab);
                 document.getElementById('panel-' + t).style.display = t === tab ? '' : 'none';
             });
+            updateTagline();
         }
 
         let _activeMediaEl = null;
