@@ -61,7 +61,8 @@
             background-attachment: fixed;
             color: var(--text);
             font-family: 'Rajdhani', sans-serif;
-            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -2127,9 +2128,16 @@
 
         // ── Auto-scale to window ─────────────────────────────────────
         function autoScale() {
-            const designW = 1440; // 基準デザイン幅
+            const designW = 1440;
+            const designH = 810; // 16:9基準
             const vw = window.innerWidth;
-            const scale = vw >= designW ? 1 : Math.max(0.35, vw / designW);
+            const vh = window.innerHeight;
+            let scale;
+            if (vw <= 960) {
+                scale = Math.max(0.3, vw / designW);
+            } else {
+                scale = Math.max(0.35, Math.min(vw / designW, vh / designH));
+            }
             document.documentElement.style.zoom = scale;
         }
         autoScale();
