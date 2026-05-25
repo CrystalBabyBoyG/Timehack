@@ -61,13 +61,22 @@
             background-attachment: fixed;
             color: var(--text);
             font-family: 'Rajdhani', sans-serif;
+            width: 100vw;
             height: 100vh;
             overflow: hidden;
+            position: relative;
+        }
+        #scaleRoot {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 1440px;
+            min-height: 810px;
+            padding: 0.8rem 1.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 0.8rem 1.5rem;
-            overflow-x: hidden;
+            transform-origin: top left;
         }
         body::before {
             content: '';
@@ -735,6 +744,7 @@
     </style>
 </head>
 <body>
+<div id="scaleRoot">
     <div class="alert-overlay" id="alertOverlay"></div>
 
     <!-- Theme toggle -->
@@ -1030,6 +1040,7 @@
             </div>
         </div>
     </div>
+</div><!-- /scaleRoot -->
 
     <script>
         // ── i18n ─────────────────────────────────────────────────────
@@ -2128,17 +2139,28 @@
 
         // ── Auto-scale to window ─────────────────────────────────────
         function autoScale() {
-            const designW = 1440;
-            const designH = 810; // 16:9基準
+            const root = document.getElementById('scaleRoot');
             const vw = window.innerWidth;
             const vh = window.innerHeight;
-            let scale;
             if (vw <= 960) {
-                scale = Math.max(0.3, vw / designW);
+                // スマホ・タブレット: 幅基準ズーム、縦スクロールあり
+                root.style.cssText = 'width:100%;position:static;transform:none;padding:0.8rem 1.5rem;display:flex;align-items:center;justify-content:center;';
+                document.documentElement.style.zoom = Math.max(0.3, vw / 960);
+                document.body.style.height = 'auto';
+                document.body.style.overflow = '';
             } else {
-                scale = Math.max(0.35, Math.min(vw / designW, vh / designH));
+                // PC: コンテンツを計測してスケール
+                document.documentElement.style.zoom = '';
+                document.body.style.height = '100vh';
+                document.body.style.overflow = 'hidden';
+                root.style.cssText = 'position:absolute;top:0;left:0;width:1440px;min-height:810px;padding:0.8rem 1.5rem;display:flex;align-items:center;justify-content:center;transform-origin:top left;transform:none;';
+                const W = 1440;
+                const H = Math.max(root.offsetHeight, 810);
+                const scale = Math.min(vw / W, vh / H);
+                const ox = (vw - W * scale) / 2;
+                const oy = (vh - H * scale) / 2;
+                root.style.transform = `translate(${ox}px, ${oy}px) scale(${scale})`;
             }
-            document.documentElement.style.zoom = scale;
         }
         autoScale();
         window.addEventListener('resize', autoScale);
