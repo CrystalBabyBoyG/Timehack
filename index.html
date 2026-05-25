@@ -732,14 +732,41 @@
             #analogClock { width: min(260px, 22vw); }
         }
         @media (max-width: 960px) {
-            .page-layout { grid-template-columns: 1fr; }
+            .page-layout { grid-template-columns: 1fr; gap: 0.7rem; }
             .grid-left { justify-content: center; }
-            .sidebar { flex-direction: row; padding: 0.4rem; border-radius: 12px; }
-            .nav-item { flex-direction: row; gap: 0.5rem; padding: 0.6rem 1rem; min-width: auto; }
-            .nav-item.active { box-shadow: inset 0 -2px 0 var(--accent), 0 0 12px rgba(255, 255, 255, 0.06); }
-            .nav-icon { font-size: 1.1rem; }
-            .grid-right { order: -1; flex-direction: row; align-items: center; justify-content: center; gap: 2rem; flex-wrap: wrap; }
-            #analogClock { width: min(200px, 45vw); }
+            .grid-right { display: none; }
+            .sidebar {
+                flex-direction: row;
+                padding: 0.3rem 0.5rem;
+                border-radius: 50px;
+                gap: 0.15rem;
+                width: fit-content;
+            }
+            .nav-item {
+                flex-direction: row;
+                gap: 0.35rem;
+                padding: 0.5rem 1rem;
+                min-width: auto;
+                border-radius: 30px;
+            }
+            .nav-item.active {
+                background: rgba(255,255,255,0.1);
+                border-color: rgba(255,255,255,0.28);
+                box-shadow: none;
+            }
+            .nav-icon { font-size: 1rem; }
+            .nav-label { font-size: 0.6rem; }
+            .logo { letter-spacing: 0.22em; }
+            .tagline { margin-bottom: 0.5rem; }
+            .card { padding: 0.8rem 1rem; }
+            .lang-toggle { top: 0.6rem; right: 0.6rem; }
+            .theme-toggle { top: 0.6rem; right: 5.5rem; }
+            .interval-setter { gap: 0.5rem; }
+            .time-input { font-size: 1.6rem; width: 3.6rem; }
+            .spin-btn { width: 3.6rem; }
+            .controls { gap: 0.6rem; }
+            .sound-grid { grid-template-columns: repeat(5, 1fr); gap: 0.3rem; }
+            .alarm-setter { gap: 0.5rem; }
         }
     </style>
 </head>
@@ -2143,11 +2170,11 @@
             const vw = window.innerWidth;
             const vh = window.innerHeight;
             if (vw <= 960) {
-                // スマホ・タブレット: 幅基準ズーム、縦スクロールあり
-                root.style.cssText = 'width:100%;position:static;transform:none;padding:0.8rem 1.5rem;display:flex;align-items:center;justify-content:center;';
-                document.documentElement.style.zoom = Math.max(0.3, vw / 960);
+                // スマホ・タブレット: ズームなし、CSSレイアウトに任せる
+                root.style.cssText = 'width:100%;min-width:0;position:static;transform:none;padding:0.6rem 0.8rem;display:flex;flex-direction:column;align-items:stretch;';
+                document.documentElement.style.zoom = '';
                 document.body.style.height = 'auto';
-                document.body.style.overflow = '';
+                document.body.style.overflow = 'auto';
             } else {
                 // PC: コンテンツを計測してスケール
                 document.documentElement.style.zoom = '';
