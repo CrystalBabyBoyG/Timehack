@@ -2,7 +2,12 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#080808">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
     <title>見やすい無料タイマー｜高性能インターバルタイマー -TIME HACK-</title>
     <meta name="description" content="見やすくかっこいいデザインの無料ブラウザタイマー。インターバル・アラーム・ストップウォッチ・世界時計が1ページで使える高性能Webアプリ。登録不要。時間・セット数を自由に設定可能。">
     <meta name="keywords" content="見やすいタイマー,無料タイマー,ブラウザタイマー,高性能タイマー,かっこいいタイマー,設定可能タイマー,インターバルタイマー,タイマー,筋トレタイマー,筋トレ,HIIT,サーキットトレーニング,トレーニングタイマー,ジムタイマー,インターバル,タイムハック,time hack,timeshacker,アラーム,ストップウォッチ,世界時計,ポモドーロ,カウントダウン">
@@ -51,21 +56,42 @@
             --text-dim: #888888;
             --glow: 0 0 28px rgba(255, 255, 255, 0.35);
             --glow-red: 0 0 25px rgba(255, 68, 68, 0.5);
+            /* 罫線・面の基準色（タッチ端末の hover 解除で復元値として使う） */
+            --line: rgba(255, 255, 255, 0.15);
+            --line-soft: rgba(255, 255, 255, 0.06);
+            --fill: rgba(255, 255, 255, 0.08);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
         body {
             background-color: #080808;
-            background-image: url('bg.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
             color: var(--text);
             font-family: 'Rajdhani', sans-serif;
             width: 100vw;
             height: 100vh;
             overflow: hidden;
             position: relative;
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: contain;
         }
+        /* 背景画像は固定レイヤーに分離（縦スクロール時に拡大・ガタつきしない） */
+        .bg-layer {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            /* bg.jpg が読み込めない環境では、下段のグラデーションがそのまま背景になる。
+               画像が置かれれば最上段の bg.jpg が全面を覆うので見た目は変わらない。 */
+            background-image:
+                url('bg.jpg'),
+                radial-gradient(ellipse at 22% 12%, rgba(198, 216, 234, 0.17), transparent 58%),
+                radial-gradient(ellipse at 82% 86%, rgba(126, 156, 190, 0.13), transparent 55%),
+                linear-gradient(165deg, #2c343e 0%, #171c22 48%, #0a0d11 100%);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            pointer-events: none;
+        }
+        body[data-theme]:not([data-theme="ice"]) .bg-layer { display: none; }
         #scaleRoot {
             position: absolute;
             top: 0;
@@ -457,6 +483,7 @@
         .alarm-notif-btn.snooze:hover { background: rgba(255,170,0,0.15); }
         /* ── Alarm list items ── */
         #alarmList { display: flex; flex-direction: column; gap: 0.7rem; margin-top: 1rem; }
+        #alarmList:empty { display: none; }
         .alarm-item { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 0.9rem 1.1rem; display: flex; align-items: center; gap: 1rem; }
         .alarm-item.firing { border-color: var(--danger); box-shadow: 0 0 14px rgba(255,23,68,0.3); animation: alarmFlash 0.5s ease infinite; }
         .alarm-item-time { font-family: 'Share Tech Mono', monospace; font-size: 1.6rem; color: #fff; min-width: 5ch; }
@@ -645,6 +672,8 @@
         .theme-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.15); }
 
         /* ── Background themes ── */
+        /* グラデーション系テーマは縦長ページでもビューポート固定に見せる */
+        body[data-theme]  { background-attachment: fixed; background-size: cover; background-position: center; }
         body[data-theme="dark"]   { background-image: none; }
         body[data-theme="ocean"]  { background-image: linear-gradient(135deg,#0a1628,#0d3166,#0a1628); }
         body[data-theme="forest"] { background-image: linear-gradient(135deg,#0a1a0a,#0d2b18,#091508); }
@@ -661,6 +690,7 @@
             --accent: #111111; --accent2: #333333; --danger: #cc1100; --success: #111111;
             --text: #111111; --text-dim: #555555;
             --glow: 0 0 20px rgba(0,0,0,0.12); --glow-red: 0 0 20px rgba(180,0,0,0.3);
+            --line: rgba(0,0,0,0.14); --line-soft: rgba(0,0,0,0.07); --fill: rgba(0,0,0,0.06);
             color: #111111;
         }
         body[data-theme="white"]::before { background: rgba(255,255,255,0.10); }
@@ -722,55 +752,364 @@
         body[data-theme="white"] .clock-tz-select { background: rgba(255,255,255,0.7); border-color: rgba(0,0,0,0.15); }
         body[data-theme="white"] .world-tz-select { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.18); }
 
-        /* ── Responsive ── */
-        /* 中間幅: サイドバーを縮小、ギャップを詰める */
-        @media (max-width: 1200px) {
-            .page-layout { gap: 1.2rem; }
-            .card { padding: 0.9rem 1.1rem; }
-            .sidebar { gap: 0.3rem; }
-            .nav-item { padding: 0.7rem 0.6rem; min-width: 60px; }
-            #analogClock { width: min(260px, 22vw); }
+        /* ══════════════════════════════════════════════════════════════
+           Responsive
+           ≥1280px    : デスクトップ（1440px 基準を JS で等比スケール）
+           1024–1279px: 大型タブレット／小型ノート（等倍3カラム）
+           701–1023px : タブレット縦（等倍3カラム・時計を細く）
+           ≤700px     : スマートフォン（1カラム＋下部タブバー）
+           ══════════════════════════════════════════════════════════════ */
+
+        /* ── 1280px 未満はスケールを解除して等倍レイアウト ── */
+        @media (max-width: 1279px) {
+            body {
+                width: 100%;
+                height: auto;
+                min-height: 100vh;
+                min-height: 100dvh;
+                overflow-x: hidden;
+                overflow-y: auto;
+            }
+            #scaleRoot {
+                position: static;
+                width: 100%;
+                min-width: 0;
+                min-height: 0;
+                display: block;
+                transform: none !important;
+                padding:
+                    calc(env(safe-area-inset-top) + 0.9rem)
+                    calc(env(safe-area-inset-right) + 1rem)
+                    calc(env(safe-area-inset-bottom) + 1.4rem)
+                    calc(env(safe-area-inset-left) + 1rem);
+            }
+            .page-layout {
+                max-width: 100%;
+                align-items: stretch;
+            }
+            /* カードが横に伸びすぎると視線移動が増えるので上限を設ける */
+            .card { max-width: 600px; }
+
+            /* ── 情報の優先順位を組み替える ──────────────────────────
+               等倍レイアウトではカードが必ず画面より縦に長くなるため、
+               「大きな残り時間」と「開始／停止」が折り返しの下に隠れる。
+               この2つをカード先頭に引き上げ、設定項目をその下に置く。 */
+            #panel-timer { display: flex; flex-direction: column; }
+            #panel-timer > .countdown-section {
+                order: -6;
+                border-top: none;
+                padding-top: 0;
+            }
+            #panel-timer > .progress-wrap { order: -5; }
+            #panel-timer > .sound-notice  { order: -4; }
+            #panel-timer > .controls      { order: -3; margin-bottom: 0.55rem; }
+            #panel-timer > .stats {
+                order: -2;
+                margin-bottom: 0.9rem;
+                padding-bottom: 0.9rem;
+                border-bottom: 1px solid rgba(255,255,255,0.08);
+            }
+            body[data-theme="white"] #panel-timer > .stats { border-bottom-color: rgba(0,0,0,0.08); }
+            /* 大きな数字がすぐ上にあるので見出しは省く */
+            #panel-timer > [data-i18n="lbl_next_alert"] { display: none; }
+
+            /* アラームは登録済み一覧を先に見せる */
+            #panel-alarm { display: flex; flex-direction: column; }
+            #panel-alarm > #alarmList { order: -1; margin-top: 0; margin-bottom: 1rem; }
+            .grid-left, .grid-right {
+                position: sticky;
+                top: calc(env(safe-area-inset-top) + 0.9rem);
+                align-self: start;
+            }
+            /* 右上に固定表示している THEME / EN・JA と時計が重ならないよう空ける */
+            .grid-right { padding-top: 2.6rem; }
+            .footer { margin-top: 1rem; }
         }
-        @media (max-width: 960px) {
-            .page-layout { grid-template-columns: 1fr; gap: 0.7rem; }
-            .grid-left { justify-content: center; }
+
+        /* ── 1024–1279px: 大型タブレット・小型ノート ── */
+        @media (min-width: 1024px) and (max-width: 1279px) {
+            .page-layout {
+                grid-template-columns: auto minmax(0, 1fr) auto;
+                gap: 1.4rem;
+            }
+            .nav-item { padding: 0.8rem 0.7rem; min-width: 70px; }
+            .card { padding: 1rem 1.2rem; }
+            #analogClock { width: min(26vw, 280px); }
+            .clock-digital-time { font-size: 1.8rem; }
+            .clock-tz-select { max-width: 220px; }
+            .grid-right { gap: 1rem; }
+        }
+
+        /* ── 701–1023px: タブレット縦 ── */
+        @media (min-width: 701px) and (max-width: 1023px) {
+            .page-layout {
+                grid-template-columns: auto minmax(0, 1fr) auto;
+                gap: 1rem;
+            }
+            .sidebar { padding: 0.6rem 0.35rem; gap: 0.2rem; }
+            .nav-item { padding: 0.7rem 0.45rem; min-width: 62px; gap: 0.3rem; }
+            .nav-icon { font-size: 1.35rem; }
+            .nav-label { font-size: 0.54rem; letter-spacing: 0.12em; }
+            .card { padding: 0.95rem 1.05rem; }
+            .logo { font-size: 2.4rem; }
+            #analogClock { width: min(25vw, 210px); }
+            .clock-digital-time { font-size: 1.45rem; }
+            .clock-year { font-size: 1.05rem; }
+            .clock-digital-date { font-size: 0.68rem; letter-spacing: 0.14em; }
+            .clock-tz-select { max-width: 210px; }
+            .grid-right { gap: 0.8rem; }
+            .interval-setter { gap: 0.5rem; }
+        }
+
+        /* ── ≤700px: スマートフォン ── */
+        @media (max-width: 700px) {
+            #scaleRoot {
+                /* 下部タブバーの高さぶんを確保 */
+                padding-bottom: calc(env(safe-area-inset-bottom) + 5.4rem);
+            }
+            .page-layout {
+                grid-template-columns: minmax(0, 1fr);
+                gap: 0.4rem;
+                max-width: 34rem;
+                margin: 0 auto;
+            }
             .grid-right { display: none; }
+
+            /* ヘッダー：テーマ=左上／言語=右上、ロゴはその下に逃がす */
+            .grid-center { padding-top: 2.4rem; }
+            .theme-toggle {
+                top: calc(env(safe-area-inset-top) + 0.55rem);
+                right: auto;
+                left: calc(env(safe-area-inset-left) + 0.8rem);
+            }
+            .theme-panel { right: auto; left: 0; }
+            .lang-toggle {
+                top: calc(env(safe-area-inset-top) + 0.55rem);
+                right: calc(env(safe-area-inset-right) + 0.8rem);
+            }
+            .logo { font-size: 1.95rem; letter-spacing: 0.2em; }
+            .tagline { font-size: 0.64rem; letter-spacing: 0.22em; margin-bottom: 0.55rem; }
+
+            /* ── 下部タブバー ── */
+            .grid-left {
+                position: fixed;
+                left: 0; right: 0; bottom: 0;
+                top: auto;
+                z-index: 120;
+                display: block;
+                padding: 1.4rem 0.6rem calc(env(safe-area-inset-bottom) + 0.45rem);
+                background: linear-gradient(to top, rgba(0,0,0,0.88) 45%, rgba(0,0,0,0));
+                pointer-events: none;
+            }
+            body[data-theme="white"] .grid-left {
+                background: linear-gradient(to top, rgba(235,235,235,0.92) 45%, rgba(235,235,235,0));
+            }
             .sidebar {
+                pointer-events: auto;
                 flex-direction: row;
-                padding: 0.3rem 0.5rem;
-                border-radius: 50px;
-                gap: 0.15rem;
-                width: fit-content;
+                width: 100%;
+                max-width: 30rem;
+                margin: 0 auto;
+                padding: 0.3rem;
+                gap: 0.2rem;
+                border-radius: 18px;
             }
             .nav-item {
-                flex-direction: row;
-                gap: 0.35rem;
-                padding: 0.5rem 1rem;
-                min-width: auto;
-                border-radius: 30px;
+                flex: 1 1 0;
+                min-width: 0;
+                justify-content: center;
+                gap: 0.18rem;
+                padding: 0.45rem 0.15rem;
+                border-radius: 14px;
+                min-height: 52px;
             }
             .nav-item.active {
-                background: rgba(255,255,255,0.1);
-                border-color: rgba(255,255,255,0.28);
+                background: rgba(255,255,255,0.13);
+                border-color: rgba(255,255,255,0.3);
                 box-shadow: none;
             }
-            .nav-icon { font-size: 1rem; }
-            .nav-label { font-size: 0.6rem; }
-            .logo { letter-spacing: 0.22em; }
-            .tagline { margin-bottom: 0.5rem; }
-            .card { padding: 0.8rem 1rem; }
-            .lang-toggle { top: 0.6rem; right: 0.6rem; }
-            .theme-toggle { top: 0.6rem; right: 5.5rem; }
-            .interval-setter { gap: 0.5rem; }
-            .time-input { font-size: 1.6rem; width: 3.6rem; }
-            .spin-btn { width: 3.6rem; }
+            body[data-theme="white"] .nav-item.active { box-shadow: none; }
+            .nav-icon { font-size: 1.3rem; }
+            .nav-label { font-size: 0.54rem; letter-spacing: 0.08em; }
+
+            /* ── カード内 ── */
+            .card { padding: 0.9rem 0.85rem; border-radius: 18px; }
+            .section-label { font-size: 0.66rem; letter-spacing: 0.24em; }
+            .interval-setter, .alarm-setter { gap: 0.45rem; }
+            .time-input { font-size: 1.7rem; width: 3.9rem; }
+            .spin-btn { width: 3.9rem; }
+            .colon { font-size: 1.4rem; }
+            .countdown { font-size: clamp(2.6rem, 13vw, 3.6rem); }
+            .alarm-big { font-size: clamp(2.6rem, 14vw, 3.8rem); }
+            .sw-display { font-size: clamp(2.8rem, 15vw, 4rem); }
             .controls { gap: 0.6rem; }
-            .sound-grid { grid-template-columns: repeat(5, 1fr); gap: 0.3rem; }
-            .alarm-setter { gap: 0.5rem; }
+
+            .seq-add-row { flex-wrap: wrap; justify-content: center; gap: 0.6rem; }
+            .seq-add-btn { padding: 0.65rem 1.4rem !important; }
+            .seq-list { max-height: 8.5rem; }
+            .sw-laps { max-height: none; }
+            .upload-zone { padding: 0.65rem 0.7rem; gap: 0.6rem; }
+            .upload-hint { display: none; }
+            .stats { gap: 0.5rem; }
+
+            /* アラーム一覧：横幅が足りないので操作ボタンを次の行へ */
+            .alarm-item { flex-wrap: wrap; padding: 0.75rem 0.85rem; gap: 0.5rem 0.7rem; }
+            .alarm-item-time { font-size: 1.45rem; }
+            /* ボタンが2つ（スヌーズ＋閉じる）のときだけ次の行へ落とす */
+            .alarm-item-btns { flex: 0 0 auto; }
+            .alarm-item-btns:has(> * + *) { flex: 1 1 100%; justify-content: flex-end; }
+
+            .world-add-row { flex-wrap: wrap; }
+            .world-add-row .btn { flex: 1 1 100%; }
+            .world-tz-select { flex: 1 1 100%; }
+            .world-city-time { font-size: 1.4rem; }
+
+            /* 通知バナーは画面幅いっぱいに折り返す */
+            .alarm-notif {
+                top: calc(env(safe-area-inset-top) + 0.6rem);
+                left: calc(env(safe-area-inset-left) + 0.6rem);
+                right: calc(env(safe-area-inset-right) + 0.6rem);
+                transform: none;
+                white-space: normal;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.5rem 0.7rem;
+                padding: 0.8rem 0.9rem;
+                animation: slideDownFluid 0.3s ease;
+            }
+            @keyframes slideDownFluid {
+                from { opacity: 0; transform: translateY(-0.8rem); }
+                to   { opacity: 1; transform: translateY(0); }
+            }
+            .footer { margin-top: 0.9rem; font-size: 0.65rem; }
+        }
+
+        /* ── ≤899px: サウンド5枚は1枚あたりが細くなりすぎるので3列に ── */
+        @media (max-width: 899px) {
+            .sound-grid {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.4rem;
+            }
+            /* 下段の2枚も中央に揃う */
+            .sound-grid .sound-card {
+                flex: 0 0 calc(33.333% - 0.27rem);
+                padding: 0.55rem 0.25rem;
+            }
+            .sound-icon { font-size: 1.5rem; }
+            .sound-name { font-size: 0.62rem; letter-spacing: 0.08em; }
+        }
+
+        /* 極小幅（iPhone SE など） */
+        @media (max-width: 360px) {
+            .logo { font-size: 1.65rem; letter-spacing: 0.14em; }
+            .time-input, .spin-btn { width: 3.4rem; }
+            .time-input { font-size: 1.5rem; }
+            .nav-label { font-size: 0.5rem; }
+            .card { padding: 0.8rem 0.7rem; }
+        }
+
+        /* 横向きスマホ：縦が狭いので余白と大型数字を圧縮 */
+        @media (max-width: 900px) and (orientation: landscape) and (max-height: 500px) {
+            .grid-center { padding-top: 2.2rem; }
+            .logo { font-size: 1.5rem; margin-bottom: 0; }
+            .tagline { display: none; }
+            .countdown { font-size: 2.4rem; }
+            .sw-display { font-size: 2.6rem; padding: 0.7rem 0 0.5rem; }
+            .alarm-big { font-size: 2.4rem; }
+        }
+
+        /* ══════════════════════════════════════════════════════════════
+           タッチ操作向けのサイズ調整
+           タッチ端末、または 1024px 未満（＝スマホ／タブレット用レイアウトの幅）
+           ══════════════════════════════════════════════════════════════ */
+        @media (hover: none), (max-width: 1023px) {
+            /* タップ領域を 38–44px 以上に */
+            .spin-btn { height: 2.3rem; font-size: 0.95rem; }
+            .btn { padding: 0.8rem 0.5rem; }
+            .preset-btn { font-size: 0.82rem; padding: 0.5rem 0.9rem; }
+            .preview-btn { font-size: 0.7rem; padding: 0.45rem 0.6rem; min-height: 36px; }
+            .upload-preview-btn { min-height: 40px; padding: 0.4rem 0.8rem; }
+            .seq-item { padding: 0.5rem; }
+            .seq-item-del { width: 2.1rem; height: 2.1rem; font-size: 1rem; }
+            .seq-loop-btn, .sw-lap-btn { padding: 0.8rem; }
+            .alarm-item-btn { min-height: 40px; padding: 0.4rem 0.9rem; font-size: 0.85rem; }
+            .world-city-remove { min-width: 40px; min-height: 40px; font-size: 1rem; }
+            .lang-btn { padding: 0.45rem 0.8rem; font-size: 0.85rem; }
+            .theme-toggle-btn { padding: 0.45rem 0.75rem; font-size: 0.85rem; }
+            .theme-swatch { padding: 0.5rem 0.6rem; font-size: 0.75rem; }
+            .volume-row { padding: 0.25rem 0.2rem; }
+            .volume-slider { height: 5px; }
+            .volume-slider::-webkit-slider-thumb { width: 20px; height: 20px; }
+            .volume-slider::-moz-range-thumb { width: 20px; height: 20px; }
+
+            /* iOS の自動ズーム防止（16px 未満の入力欄を拡大） */
+            .alarm-msg-input, .world-tz-select { font-size: 16px; }
+            .clock-tz-select { font-size: 14px; padding: 0.45rem 0.6rem; }
+
+            /* スピンボタンの長押しリピート中に選択・拡大鏡が出ないように */
+            .spin-btn, .nav-item, .preset-btn, .sound-card, .btn, .seq-loop-btn, .sw-lap-btn {
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                user-select: none;
+                touch-action: manipulation;
+            }
+        }
+
+        /* ══════════════════════════════════════════════════════════════
+           タッチ端末のみ（マウス環境の hover は壊さない）
+           ══════════════════════════════════════════════════════════════ */
+        @media (hover: none) {
+            /* キーボードショートカットの案内は不要 */
+            .kb-hints { display: none; }
+
+            /* タップ後に hover が残るのを打ち消す */
+            body[data-theme] .nav-item:hover:not(.active) { background: transparent; border-color: transparent; }
+            body[data-theme] .preset-btn:hover:not(:disabled) { border-color: var(--line); color: var(--text-dim); background: var(--surface2); }
+            body[data-theme] .spin-btn:hover { color: var(--text-dim); background: var(--surface2); }
+            body[data-theme] .sound-card:hover:not(.selected) { border-color: var(--line-soft); background: var(--surface2); }
+            body[data-theme] .preview-btn:hover:not(.playing) { background: var(--line-soft); border-color: var(--line-soft); color: var(--text-dim); }
+            body[data-theme] .btn-start:hover:not(:disabled) { background: var(--fill); box-shadow: none; }
+            body[data-theme] .btn-stop:hover:not(:disabled) { background: rgba(255,23,68,0.08); box-shadow: none; }
+            body[data-theme] .btn-neutral:hover:not(:disabled) { background: var(--fill); color: var(--text-dim); }
+            body[data-theme] .upload-zone:hover:not(.loaded) { border-color: var(--line); background: transparent; }
+            body[data-theme] .seq-loop-btn:hover:not(:disabled):not(.active) { border-color: var(--line); color: var(--text-dim); background: var(--fill); }
+            body[data-theme] .sw-lap-btn:hover:not(:disabled) { border-color: var(--line); color: var(--text-dim); background: var(--fill); }
+            body[data-theme] .sw-lap-row:hover { background: transparent; }
+            body[data-theme] .lang-btn:hover:not(.active) { background: var(--line-soft); color: var(--text-dim); }
+            body[data-theme] .theme-swatch:hover:not(.active) { background: transparent; color: var(--text-dim); }
+            body[data-theme] .theme-toggle-btn:hover { background: var(--line-soft); color: var(--text-dim); }
+            body[data-theme] .world-city-remove:hover { border-color: var(--line); color: var(--text-dim); background: transparent; }
+            body[data-theme] .alarm-item-btn:hover { background: var(--fill); }
+            body[data-theme] .clock-tz-select:hover { border-color: var(--line); color: var(--text-dim); }
+            body[data-theme] .seq-item-del:hover:not(:disabled) { border-color: rgba(255,23,68,0.2); color: rgba(255,23,68,0.45); background: transparent; }
+
+            /* 押した瞬間のフィードバック（テーマを問わず効く） */
+            .nav-item:active, .preset-btn:active:not(:disabled), .sound-card:active,
+            .spin-btn:active:not(:disabled), .preview-btn:active, .upload-preview-btn:active,
+            .seq-loop-btn:active:not(:disabled), .sw-lap-btn:active:not(:disabled),
+            .alarm-item-btn:active, .theme-swatch:active, .lang-btn:active,
+            .theme-toggle-btn:active, .upload-zone:active, .world-city-remove:active,
+            .seq-item-del:active:not(:disabled) {
+                transform: scale(0.96);
+                opacity: 0.72;
+            }
+            .btn:active:not(:disabled) { transform: scale(0.97); opacity: 0.85; }
+        }
+
+        /* アニメーション削減設定を尊重 */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
     </style>
 </head>
 <body>
+<div class="bg-layer" aria-hidden="true"></div>
 <div id="scaleRoot">
     <div class="alert-overlay" id="alertOverlay"></div>
 
@@ -2165,38 +2504,105 @@
         })();
 
         // ── Auto-scale to window ─────────────────────────────────────
+        // 1280px 以上のみ 1440px 基準のデザインを等比スケール。
+        // それ未満はスマホ／タブレット用の等倍レイアウト（CSS 側で完結）。
+        const SCALE_MIN_WIDTH = 1280;
         function autoScale() {
             const root = document.getElementById('scaleRoot');
             const vw = window.innerWidth;
             const vh = window.innerHeight;
-            if (vw <= 960) {
-                // スマホ・タブレット: ズームなし、CSSレイアウトに任せる
-                root.style.cssText = 'width:100%;min-width:0;position:static;transform:none;padding:0.6rem 0.8rem;display:flex;flex-direction:column;align-items:stretch;';
-                document.documentElement.style.zoom = '';
-                document.body.style.height = 'auto';
-                document.body.style.overflow = 'auto';
-            } else {
-                // PC: コンテンツを計測してスケール
-                document.documentElement.style.zoom = '';
-                document.body.style.height = '100vh';
-                document.body.style.overflow = 'hidden';
-                root.style.cssText = 'position:absolute;top:0;left:0;width:1440px;min-height:810px;padding:0.8rem 1.5rem;display:flex;align-items:center;justify-content:center;transform-origin:top left;transform:none;';
-                const W = 1440;
-                const H = Math.max(root.offsetHeight, 810);
-                const scale = Math.min(vw / W, vh / H);
-                const ox = (vw - W * scale) / 2;
-                const oy = (vh - H * scale) / 2;
-                root.style.transform = `translate(${ox}px, ${oy}px) scale(${scale})`;
+            if (vw < SCALE_MIN_WIDTH) {
+                // インラインスタイルを消して CSS のレスポンシブ指定に完全に委ねる
+                root.removeAttribute('style');
+                return;
             }
+            root.style.transform = 'none';
+            const W = 1440;
+            const H = Math.max(root.offsetHeight, 810);
+            const scale = Math.min(vw / W, vh / H);
+            const ox = (vw - W * scale) / 2;
+            const oy = (vh - H * scale) / 2;
+            root.style.transform = `translate(${ox}px, ${oy}px) scale(${scale})`;
         }
         autoScale();
         window.addEventListener('resize', autoScale);
+        // 端末回転直後はビューポート値が確定していないことがあるため再計算
+        window.addEventListener('orientationchange', () => setTimeout(autoScale, 250));
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', autoScale);
+        }
+
+        // ── ▲▼ 長押しで連続増減 ──────────────────────────────────────
+        // タッチ操作だと1タップ1ずつでは 45 分などの設定が苦痛なので、
+        // 押しっぱなしで加速しながら連打する。単純なタップは従来どおり +1。
+        (function enableSpinHold() {
+            let holdTimer = null, repeatTimer = null, holdTarget = null;
+            function stopHold() {
+                clearTimeout(holdTimer); clearInterval(repeatTimer);
+                holdTimer = repeatTimer = holdTarget = null;
+            }
+            document.addEventListener('pointerdown', e => {
+                const btn = e.target.closest('.spin-btn');
+                if (!btn || btn.disabled) return;
+                holdTarget = btn;
+                holdTimer = setTimeout(() => {
+                    let delay = 130, ticks = 0;
+                    const tick = () => {
+                        if (!holdTarget || holdTarget.disabled) { stopHold(); return; }
+                        holdTarget.click();
+                        // 10回ごとに加速（最速 35ms）
+                        if (++ticks % 10 === 0 && delay > 35) {
+                            delay = Math.max(35, delay - 30);
+                            clearInterval(repeatTimer);
+                            repeatTimer = setInterval(tick, delay);
+                        }
+                    };
+                    repeatTimer = setInterval(tick, delay);
+                }, 420);
+            });
+            ['pointerup', 'pointercancel', 'pointerleave', 'blur'].forEach(ev =>
+                document.addEventListener(ev, stopHold, true));
+            window.addEventListener('scroll', stopHold, true);
+        })();
 
         applyLang();
         updateClock();
         setInterval(updateClock, 1000);
-        function clockAnimLoop() { drawClock(); requestAnimationFrame(clockAnimLoop); }
+        // アナログ時計は「実際に表示されているとき」だけ描画する。
+        // スマホでは非表示なので、毎フレームの描画でバッテリーを消費しない。
+        function clockAnimLoop() {
+            if (!document.hidden && canvas.offsetParent !== null) drawClock();
+            requestAnimationFrame(clockAnimLoop);
+        }
         clockAnimLoop();
+
+        // ── Screen Wake Lock（計測中に画面が消えないように） ──────────
+        let wakeLock = null, wakeLockPending = false;
+        async function acquireWakeLock() {
+            if (!('wakeLock' in navigator) || wakeLock || wakeLockPending || document.hidden) return;
+            wakeLockPending = true;
+            try {
+                wakeLock = await navigator.wakeLock.request('screen');
+                wakeLock.addEventListener('release', () => { wakeLock = null; });
+            } catch (e) { wakeLock = null; }
+            wakeLockPending = false;
+        }
+        function releaseWakeLock() {
+            if (!wakeLock) return;
+            const wl = wakeLock;
+            wakeLock = null;
+            try { wl.release(); } catch (e) {}
+        }
+        function needsWakeLock() {
+            return timerState === 'running' || swState === 'running' || alarms.length > 0;
+        }
+        function syncWakeLock() {
+            if (needsWakeLock()) acquireWakeLock(); else releaseWakeLock();
+        }
+        // 状態変化を毎秒追いかける（各関数に手を入れずに取得／解放を同期）
+        setInterval(syncWakeLock, 1000);
+        // タブ復帰時に OS が解除した wake lock を取り直す
+        document.addEventListener('visibilitychange', syncWakeLock);
 
         // ── Theme ──────────────────────────────────────────────────────
         function setTheme(name) {
